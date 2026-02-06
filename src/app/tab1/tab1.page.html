@@ -1,0 +1,29 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Hola Mundo
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Hola Mundo</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-button expand="block" class="boton" (click)="toggleText()">
+    {{ showText ? 'Ocultar texto' : 'Mostrar texto' }}
+  </ion-button>
+  <div class="ion-text-center">
+    <ion-avatar class="foto-centrada">
+      <img alt="Foto de Guts" src="assets/fotos/descarga.png" />
+    </ion-avatar>
+  </div>
+  
+
+  <div *ngIf="showText" class="texto-visible">
+    Hola Mundo Angular :D
+  </div>
+
+</ion-content>

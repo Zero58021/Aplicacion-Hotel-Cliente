@@ -1,0 +1,165 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Guía de Yo-kai</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Refrescar los datos al tirar hacia abajo -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="sync"
+      pullingText="Llama a Whisper para buscar nuevos Yo-kai..."
+      refreshingText="Buscando Yo-kais...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Buscador de Yo-kai -->
+  <div class="buscador-con-icono">
+    <img src="assets/fotos/mi-icono.png" alt="Buscar" class="icono-buscador" />
+    <ion-searchbar
+      [(ngModel)]="textoBusqueda"
+      (ionInput)="filtrarYokais()"
+      placeholder="Buscar por nombre"
+      debounce="300">
+    </ion-searchbar>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <ion-item>
+      <ion-label>Rango</ion-label>
+      <ion-select [(ngModel)]="filtroRango" (ionChange)="filtrarYokais()">
+        <ion-select-option value="">Todos</ion-select-option>
+        <ion-select-option value="S">S</ion-select-option>
+        <ion-select-option value="A">A</ion-select-option>
+        <ion-select-option value="B">B</ion-select-option>
+        <ion-select-option value="C">C</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Tipo</ion-label>
+      <ion-select [(ngModel)]="filtroTribu" (ionChange)="filtrarYokais()">
+        <ion-select-option value="">Todos</ion-select-option>
+        <ion-select-option value="Místico">Místico</ion-select-option>
+        <ion-select-option value="Luchador">Luchador</ion-select-option>
+        <ion-select-option value="Sombrío">Sombrío</ion-select-option>
+        <ion-select-option value="Sabio">Sabio</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
+
+  <!-- Lista de Yo-kai -->
+  <ion-list>
+    <ng-container *ngFor="let yokai of yokais">
+      <div *ngIf="yokai.visible" class="yokai-container">
+        <ion-item (click)="toggleYokai(yokai)">
+          <ion-thumbnail slot="start">
+            <ion-img [src]="yokai.imagenUrl"></ion-img>
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ yokai.nombre }}</h2>
+            <p>{{ yokai.tribu }} - Nº: {{ yokai.numeroYokai }} | Rango: {{ yokai.rango }}</p>
+          </ion-label>
+        </ion-item>
+
+        <!-- Detalles adicionales -->
+        <div *ngIf="yokai.mostrar" class="contenido-yokai">
+          <!-- Biografía -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Biografía:</h3>
+              <p>{{ yokai.biografia || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Habilidades -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Habilidades:</h3>
+              <p>{{ yokai.habilidades || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Ataque -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Ataque:</h3>
+              <p>{{ yokai.ataque || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Animáximum -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Animáximum:</h3>
+              <p>{{ yokai.animaximum || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Espiritación -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Espiritación:</h3>
+              <p>{{ yokai.espiritacion || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Evoluciones -->
+          <div *ngIf="yokai.evoluciones && yokai.evoluciones.length > 0">
+            <ion-card class="detalle-card">
+              <ion-card-content>
+                <h3>Evoluciones:</h3>
+                <p>{{ yokai.evoluciones || 'No disponible' }}</p>
+              </ion-card-content>
+            </ion-card>
+          </div>
+
+          <!-- Fusiones -->
+          <div *ngIf="yokai.fusiones && yokai.fusiones.length > 0">
+            <ion-card class="detalle-card">
+              <ion-card-content>
+                <h3>Fusiones:</h3>
+                <p>{{ yokai.fusiones || 'No disponible' }}</p>
+              </ion-card-content>
+            </ion-card>
+          </div>
+
+          <!-- Alimento Favorito -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Alimento Favorito:</h3>
+              <p>{{ yokai.alimentoFavorito || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Localización -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <h3>Localización:</h3>
+              <p>{{ yokai.localizacion || 'No disponible' }}</p>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Foto medalla -->
+          <ion-card class="detalle-card" *ngIf="yokai.imagenAdicional">
+            <ion-card-content>
+              <h3>Foto Medalla:</h3>
+              <ion-img [src]="yokai.imagenMedalla" alt="Imagen medalla"></ion-img>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Foto adicional -->
+          <ion-card class="detalle-card" *ngIf="yokai.imagenAdicional">
+            <ion-card-content>
+              <h3>Foto Adicional:</h3>
+              <ion-img [src]="yokai.imagenAdicional" alt="Imagen adicional"></ion-img>
+            </ion-card-content>
+          </ion-card>
+        
+        </div>
+      </div>
+    </ng-container>
+  </ion-list>
+</ion-content>

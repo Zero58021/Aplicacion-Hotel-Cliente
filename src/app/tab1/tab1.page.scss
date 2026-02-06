@@ -1,0 +1,18 @@
+.texto-visible {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: purple;
+}
+::ng-deep .boton {
+  --background: red;
+  --color: white;
+  --border-radius: 8px;
+  --margin: 0 auto;
+}
+.foto-centrada {
+  width: 120px;
+  height: 120px;
+  margin: 20px auto;
+  --border-radius: 4px;
+}

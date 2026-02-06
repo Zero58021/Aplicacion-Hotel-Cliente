@@ -1,0 +1,81 @@
+/* Tema claro */
+:root {
+  /* Colores para el tema claro */
+  
+  /* Botón */
+  --mi-boton-contorno: #3498db;        /* contorno azul */
+  --mi-boton-texto: #000000;           /* texto negro */
+  --mi-boton-hover: #2e86c1;
+
+  /* Tabla */
+  --color-tabla-texto: #000000;
+  --color-tabla-linea: #000000;
+
+  /* Fondo y texto */
+  --ion-background-color: #ffffff;     /* Fondo claro */
+  --ion-text-color: #000000;           /* Texto oscuro */
+  --ion-border-color: #dcdcdc;         /* Bordes claros */
+  --ion-item-hover-background-color: #f0f0f0; /* Color de fondo al pasar el ratón */
+  --ion-item-selected-background-color: #e0e0e0; /* Fondo cuando está seleccionado */
+}
+
+/* Tema oscuro */
+[data-theme="dark"] {
+  /* Colores para el tema oscuro */
+  
+  /* Botón */
+  --mi-boton-contorno: #f39c12;       /* contorno naranja */
+  --mi-boton-texto: #ffffff;          /* texto blanco */
+  --mi-boton-hover: #d68910;
+
+  /* Tabla */
+  --color-tabla-texto: #ffffff;
+  --color-tabla-linea: #ffffff;
+
+  /* Fondo y texto */
+  --ion-background-color: #121212;    /* Fondo oscuro */
+  --ion-text-color: #ffffff;          /* Texto blanco */
+  --ion-border-color: #333333;        /* Bordes oscuros */
+  --ion-item-hover-background-color: #333333; /* Color de fondo al pasar el ratón */
+  --ion-item-selected-background-color: #444444; /* Fondo cuando está seleccionado */
+}
+/* Redondear el ion-item, imagen y texto */
+ion-item {
+  --border-radius: 10px; /* Bordes redondeados para el item completo */
+  overflow: hidden; /* Asegura que no se vean bordes cortados */
+  margin-bottom: 15px; /* Espacio entre los ítems */
+}
+
+/* Redondear la imagen dentro del thumbnail */
+ion-thumbnail {
+  border-radius: 10px; /* Bordes redondeados para el thumbnail */
+  overflow: hidden; /* Evita que la imagen sobresalga del borde */
+}
+
+/* Redondear la imagen dentro del thumbnail */
+ion-thumbnail ion-img {
+  border-radius: 10px; /* Bordes redondeados para la imagen */
+  object-fit: cover; /* Hace que la imagen cubra bien el espacio */
+}
+
+/* Estilo para los textos dentro de ion-item */
+ion-item ion-label {
+  border-radius: 10px; /* Bordes redondeados para el label */
+  padding: 10px; /* Agregar padding para dar espacio dentro del label */
+  background-color: var(--ion-background-color); /* Fondo que puede cambiar según el tema */
+}
+
+/* Redondear el título dentro del ion-item */
+ion-item ion-label h2 {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: var(--ion-text-color);
+  margin-bottom: 5px;
+}
+
+/* Redondear el párrafo dentro del ion-item */
+ion-item ion-label p {
+  font-size: 1em;
+  color: var(--ion-text-color);
+  margin-top: 5px;
+}

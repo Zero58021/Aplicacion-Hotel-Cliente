@@ -1,0 +1,171 @@
+/* Contenedor del buscador con icono */
+.buscador-con-icono {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Aumentar espacio */
+}
+
+/* Icono al lado del buscador */
+.icono-buscador {
+  position: absolute;
+  left: 12px;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Ajuste para que el texto no tape el icono */
+ion-searchbar {
+  width: 100%;
+  padding-left: 35px;
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+}
+
+/* Estilo para los filtros (select de rango y tipo) */
+ion-item {
+  margin-bottom: 20px; /* Aumentar espacio entre filtros */
+}
+
+/* Estilo del select para filtros */
+ion-select {
+  width: 100%;
+  --padding-start: 10px;
+  --background: var(--ion-background-color); /* Fondo claro */
+  --border-radius: 8px;
+  --box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejorar el diseño del botón personalizado */
+.boton-personalizado {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: transparent !important;
+  font-weight: bold;
+  color: var(--mi-boton-texto) !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  --box-shadow: none !important;
+  --background-focused: transparent !important;
+  --background-activated: transparent !important;
+  --background-hover: transparent !important;
+  --background: transparent !important;
+}
+
+.boton-personalizado ion-label {
+  color: var(--mi-boton-texto) !important;
+}
+
+/* Estilo de la imagen dentro del botón */
+.icono-boton {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Contenedor botón + tabla */
+.tabla-container {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Contenido tabla */
+.contenido-tabla {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Imagen centrada */
+.imagen-centro {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.imagen-centro ion-img {
+  max-width: 80%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo de la tabla de filas */
+.tabla-personalizada ion-item {
+  --border-width: 0 !important;
+  border-bottom: 1px solid var(--color-tabla-linea) !important;
+  color: var(--color-tabla-texto);
+  --background: transparent !important;
+}
+
+/* Mejoras para la tarjeta de Yo-kai */
+.yokai-container {
+  margin-bottom: 15px;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 15px; /* Bordes más redondeados */
+  padding: 15px;
+  background-color: var(--ion-background-color);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.yokai-container:hover {
+  background-color: var(--ion-item-hover-background-color);
+  transform: translateY(-5px);
+}
+
+.yokai-container.selected {
+  background-color: var(--ion-item-selected-background-color);
+  border-color: #007bff;
+}
+
+.yokai-container ion-label h2 {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: var(--ion-text-color);
+  margin-bottom: 10px;
+  border-radius: 8px; /* Bordes redondeados alrededor del nombre del Yo-kai */
+  padding: 8px; /* Espacio adicional alrededor del texto */
+}
+
+/* Estilo para los detalles dentro de las tarjetas de Yo-kai */
+.detalle-card ion-card-content p {
+  font-size: 14px;
+  color: var(--ion-text-color);
+  margin-bottom: 5px;
+  border-radius: 8px; /* Bordes redondeados en los párrafos */
+}
+
+.detalle-card ion-card-content h3 {
+  font-weight: bold;
+  color: var(--ion-text-color);
+}
+
+/* Redondeo para las imágenes dentro de las tarjetas de Yo-kai */
+.detalle-card ion-img {
+  border-radius: 10px; /* Bordes redondeados en las imágenes dentro de las tarjetas */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+}
+
+/* Tarjetas de habilidades y otros detalles dentro del Yo-kai */
+ion-card {
+  margin-top: 10px;
+  background-color: var(--ion-background-color);
+  border-radius: 10px; /* Bordes redondeados en las tarjetas internas */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo general de los ítems dentro de las tarjetas */
+.detalle-card ion-item {
+  font-size: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px; /* Bordes redondeados en los ítems dentro de la tarjeta */
+}
