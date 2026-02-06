@@ -1,43 +1,54 @@
 /* Tema claro */
 :root {
-  /* Colores para el tema claro */
-  
+  /* Paleta principal (verdes) */
+  --ion-color-primary: #2e7d32; /* verde */
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade: #27632a;
+  --ion-color-primary-tint: #3e8a3b;
+
+  --ion-color-success: #2e7d32;
+  --ion-color-success-contrast: #ffffff;
+
+  --ion-color-secondary: #66bb6a;
+  --ion-color-warning: #fbc02d;
+  --ion-color-danger: #c62828;
+
   /* Botón */
-  --mi-boton-contorno: #3498db;        /* contorno azul */
-  --mi-boton-texto: #000000;           /* texto negro */
-  --mi-boton-hover: #2e86c1;
+  --mi-boton-contorno: var(--ion-color-primary);
+  --mi-boton-texto: var(--ion-color-primary-contrast);
+  --mi-boton-hover: var(--ion-color-primary-shade);
 
   /* Tabla */
-  --color-tabla-texto: #000000;
-  --color-tabla-linea: #000000;
+  --color-tabla-texto: #153618;
+  --color-tabla-linea: rgba(21,54,24,0.15);
 
-  /* Fondo y texto */
-  --ion-background-color: #ffffff;     /* Fondo claro */
-  --ion-text-color: #000000;           /* Texto oscuro */
-  --ion-border-color: #dcdcdc;         /* Bordes claros */
-  --ion-item-hover-background-color: #f0f0f0; /* Color de fondo al pasar el ratón */
-  --ion-item-selected-background-color: #e0e0e0; /* Fondo cuando está seleccionado */
+  /* Fondo y texto: forzar tema claro (blanco) */
+  --ion-background-color: #ffffff;     /* fondo blanco */
+  --ion-text-color: #000000;           /* texto negro */
+  --ion-border-color: rgba(0,0,0,0.08); /* bordes suaves */
+  --ion-item-hover-background-color: rgba(46,125,50,0.04); /* sutil hover verde */
+  --ion-item-selected-background-color: rgba(46,125,50,0.06);
 }
 
 /* Tema oscuro */
 [data-theme="dark"] {
-  /* Colores para el tema oscuro */
-  
-  /* Botón */
-  --mi-boton-contorno: #f39c12;       /* contorno naranja */
-  --mi-boton-texto: #ffffff;          /* texto blanco */
-  --mi-boton-hover: #d68910;
+  --ion-color-primary: #78c257; /* verde claro sobre fondo oscuro */
+  --ion-color-primary-contrast: #091f08;
+  --ion-color-success: #78c257;
 
-  /* Tabla */
-  --color-tabla-texto: #ffffff;
-  --color-tabla-linea: #ffffff;
+  --mi-boton-contorno: var(--ion-color-primary);
+  --mi-boton-texto: var(--ion-color-primary-contrast);
+  --mi-boton-hover: #5fa43f;
 
-  /* Fondo y texto */
-  --ion-background-color: #121212;    /* Fondo oscuro */
-  --ion-text-color: #ffffff;          /* Texto blanco */
-  --ion-border-color: #333333;        /* Bordes oscuros */
-  --ion-item-hover-background-color: #333333; /* Color de fondo al pasar el ratón */
-  --ion-item-selected-background-color: #444444; /* Fondo cuando está seleccionado */
+  --color-tabla-texto: #e6f5e6;
+  --color-tabla-linea: rgba(230,245,230,0.12);
+
+  /* Forzar mismo aspecto en modo oscuro (usar claro) */
+  --ion-background-color: #ffffff;
+  --ion-text-color: #000000;
+  --ion-border-color: rgba(0,0,0,0.08);
+  --ion-item-hover-background-color: rgba(46,125,50,0.04);
+  --ion-item-selected-background-color: rgba(46,125,50,0.06);
 }
 /* Redondear el ion-item, imagen y texto */
 ion-item {

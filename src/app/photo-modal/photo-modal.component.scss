@@ -1,0 +1,32 @@
+.photo-modal .modal-wrapper {
+  --background: transparent;
+}
+
+.photo-modal-content {
+  --background: #000;
+}
+
+.image-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none; /* allow pointer events for pinch/pan */
+}
+
+.image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 160ms ease;
+  transform-origin: center center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.image-wrap img {
+  max-width: 100%;
+  max-height: 100vh;
+  object-fit: contain;
+  display: block;
+}

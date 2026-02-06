@@ -32,6 +32,26 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
+/* No importar paletas que reaccionen al sistema: queremos tema claro fijo */
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Forzar esquema de color claro */
+:root {
+	color-scheme: light;
+}
+
+/* Forzar fondo global usando la variable de tema (rojo muy sutil) */
+html, body, ion-app, app-root {
+	background-color: var(--ion-background-color) !important;
+	color: var(--ion-text-color) !important;
+}
+
+ion-content, .ion-page {
+	background-color: var(--ion-background-color) !important;
+}
+
+/* Mejor contraste para links y botones que usan la paleta */
+a, button, ion-button {
+	color: var(--ion-color-primary) !important;
+}

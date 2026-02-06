@@ -1,29 +1,296 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Hola Mundo
+      Nombre Hotel
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Hola Mundo</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-button expand="block" class="boton" (click)="toggleText()">
-    {{ showText ? 'Ocultar texto' : 'Mostrar texto' }}
-  </ion-button>
-  <div class="ion-text-center">
-    <ion-avatar class="foto-centrada">
-      <img alt="Foto de Guts" src="assets/fotos/descarga.png" />
-    </ion-avatar>
-  </div>
-  
+<ion-content [fullscreen]="true" class="ion-padding tab1-content">
+  <!-- Top area: rounded box and wave divider -->
+  <div class="top-area">
+    <div class="header-box">
+      <div class="booking-widget booking-widget-photo">
+        <div class="dates-top">
+          <div class="date-pill" (click)="openCheckin()" [class.open]="activePicker==='checkin'">
+            <div class="pill-label">Fecha de entrada</div>
+            <div class="pill-date">{{ checkinDate ? (checkinDate | date:'EEE, d MMM y') : 'sáb, 7 feb 2026' }}</div>
+            <ion-datetime #checkinPicker class="picker-hidden" presentation="date" interface="popover" [(ngModel)]="checkinDate" (ionChange)="onDatesChange(); closePickers()" (ionCancel)="closePickers()" name="checkin"></ion-datetime>
+          </div>
 
-  <div *ngIf="showText" class="texto-visible">
-    Hola Mundo Angular :D
+          <div class="date-pill" (click)="openCheckout()" [class.open]="activePicker==='checkout'">
+            <div class="pill-label">Fecha de salida</div>
+            <div class="pill-date">{{ checkoutDate ? (checkoutDate | date:'EEE, d MMM y') : 'lun, 23 feb 2026' }}</div>
+            <ion-datetime #checkoutPicker class="picker-hidden" presentation="date" interface="popover" [(ngModel)]="checkoutDate" (ionChange)="onDatesChange(); closePickers()" (ionCancel)="closePickers()" name="checkout"></ion-datetime>
+          </div>
+        </div>
+        <!-- if a picker is active, show an expanded inline panel with calendar + selects to avoid popover clipping on mobile -->
+        <ng-container *ngIf="activePicker; else compactPicks">
+          <div class="expanded-panel">
+            <div class="expanded-calendar">
+              <ng-container *ngIf="activePicker === 'checkin' || activePicker === 'checkout'">
+                <div class="custom-calendar">
+                  <div class="cal-header">
+                    <button class="cal-nav" (click)="prevMonth()">‹</button>
+                    <div class="cal-title">{{ monthLabel() }}</div>
+                    <button class="cal-nav" (click)="nextMonth()">›</button>
+                  </div>
+                  <div class="cal-grid">
+                    <div class="cal-weekday" *ngFor="let wd of ['Lu','Ma','Mi','Ju','Vi','Sa','Do']">{{wd}}</div>
+                    <ng-container *ngFor="let week of getCalendarMatrix()">
+                      <ng-container *ngFor="let day of week">
+                        <div class="cal-day" [class.empty]="!day" [class.in-range]="day && isInRangeDate(day)" [class.start]="day && isSameDay(checkinDate, day)" [class.end]="day && isSameDay(checkoutDate, day)" (click)="day && selectDayFromCalendar(day)">
+                          <span *ngIf="day">{{ day.getDate() }}</span>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+
+            <div class="picks-row">
+              <div class="small-box">
+                <div class="box-label">Adultos</div>
+                <div class="box-value">{{ adults }}</div>
+                <ion-select [(ngModel)]="adults" aria-label="Seleccionar adultos">
+                  <ion-select-option *ngFor="let n of adultsOptions" [value]="n">{{n}}</ion-select-option>
+                </ion-select>
+              </div>
+
+              <div class="small-box">
+                <div class="box-label">Niños</div>
+                <div class="box-value">{{ children }}</div>
+                <ion-select [(ngModel)]="children" aria-label="Seleccionar niños">
+                  <ion-select-option *ngFor="let n of childrenOptions" [value]="n">{{n}}</ion-select-option>
+                </ion-select>
+              </div>
+
+              <div class="small-box">
+                <div class="box-label">Habitaciones</div>
+                <div class="box-value">{{ rooms }}</div>
+                <ion-select [(ngModel)]="rooms" aria-label="Seleccionar habitaciones">
+                  <ion-select-option *ngFor="let n of roomsOptions" [value]="n">{{n}}</ion-select-option>
+                </ion-select>
+              </div>
+
+              <div class="pets-row">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                  <div>
+                    <div class="box-label">¿Viajas con mascotas?</div>
+                  </div>
+                  <ion-toggle [(ngModel)]="hasPets" aria-label="Viajas con mascotas"></ion-toggle>
+                </div>
+                <div class="pets-info">
+                  <div class="muted">Los animales de servicio no se consideran mascotas.</div>
+                </div>
+              </div>
+            </div>
+
+            <ion-button expand="block" class="search-btn big-green" (click)="search(); closePickers()">BUSCAR</ion-button>
+          </div>
+        </ng-container>
+
+        <ng-template #compactPicks>
+          <div class="picks-row compact-picks">
+            <div class="small-box" role="button" tabindex="0" (click)="openAdultSelect()">
+              <div class="box-label">Adultos</div>
+              <div class="box-value">{{ adults }}</div>
+              <ion-select #adultSelect interface="popover" [(ngModel)]="adults" aria-label="Seleccionar adultos">
+                <ion-select-option *ngFor="let n of adultsOptions" [value]="n">{{n}}</ion-select-option>
+              </ion-select>
+            </div>
+
+            <div class="small-box" role="button" tabindex="0" (click)="openChildSelect()">
+              <div class="box-label">Niños</div>
+              <div class="box-value">{{ children }}</div>
+              <ion-select #childSelect interface="popover" [(ngModel)]="children" aria-label="Seleccionar niños">
+                <ion-select-option *ngFor="let n of childrenOptions" [value]="n">{{n}}</ion-select-option>
+              </ion-select>
+            </div>
+
+            <div class="small-box" role="button" tabindex="0" (click)="openRoomSelect()">
+              <div class="box-label">Habitaciones</div>
+              <div class="box-value">{{ rooms }}</div>
+              <ion-select #roomSelect interface="popover" [(ngModel)]="rooms" aria-label="Seleccionar habitaciones">
+                <ion-select-option *ngFor="let n of roomsOptions" [value]="n">{{n}}</ion-select-option>
+              </ion-select>
+            </div>
+
+            <div class="small-box pets-row">
+              <div class="pets-top">
+                <div class="box-label">¿Viajas con mascotas?</div>
+                <ion-toggle [(ngModel)]="hasPets" aria-label="Viajas con mascotas"></ion-toggle>
+              </div>
+              <div class="pets-info">
+                <div class="muted">Los animales de servicio no se consideran mascotas.</div>
+                
+              </div>
+            </div>
+          </div>
+
+          <ion-button expand="block" class="search-btn big-green" (click)="search()">BUSCAR</ion-button>
+        </ng-template>
+      </div>
+    </div>
+    <!-- Línea verde con ola animada debajo del rectángulo -->
+    <div class="green-line" aria-hidden="true">
+      <!-- top wave only -->
+      <svg class="green-wave top" viewBox="0 0 2400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0,40 C150,80 350,0 600,40 C750,60 900,20 1200,40 C1350,60 1500,20 1800,40 C1950,60 2100,20 2400,40 L2400,80 L0,80 Z" fill="#2e7d32"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Onda eliminada -->
+
+  <!-- Section title -->
+  <h1 class="section-title">CONOCENOS</h1>
+
+  <!-- Image card -->
+  <!-- Album: horizontal swipeable gallery -->
+  <div class="album-wrapper">
+    <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior" title="Anterior">‹</button>
+    <div class="album-container" #albumContainer role="album" aria-label="Galería">
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/1.webp" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/1.webp')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/2.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/2.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/3.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/3.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/4.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/4.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    </div>
+    <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente" title="Siguiente">›</button>
+  </div>
+
+  <!-- Section title -->
+  <h1 class="section-title">NUESTRAS INSTALACIONES</h1>
+
+  <!-- Image card -->
+  <!-- Album: horizontal swipeable gallery -->
+  <div class="album-wrapper">
+    <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior" title="Anterior">‹</button>
+    <div class="album-container" #albumContainer role="album" aria-label="Galería">
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/1.webp" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/1.webp')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/2.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/2.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/3.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/3.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    <div class="album-item">
+      <div class="image-card">
+        <div class="thumb-100x50">
+          <img src="assets/fotosInicio/4.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/4.jpg')" style="cursor:pointer" />
+        </div>
+      </div>
+    </div>
+    </div>
+    <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente" title="Siguiente">›</button>
+  </div>
+
+  <!-- Sección de opiniones debajo del segundo álbum -->
+  <div class="opinions-section ion-padding">
+    <h2 class="section-subtitle">Opiniones</h2>
+
+    <!-- Lista de opiniones anteriores -->
+    <div *ngIf="comments && comments.length; else noComments">
+      <ion-list>
+        <ion-item *ngFor="let c of comments">
+          <ion-avatar slot="start">
+            <img src="assets/avatar-placeholder.png" alt="avatar" />
+          </ion-avatar>
+          <ion-label>
+            <h3>{{ c.name }} <span class="rating">{{ getStars(c.rating) }}</span></h3>
+            <p class="comment-text">{{ c.text }}</p>
+            <p class="comment-date">{{ c.date | date:'short' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+    <ng-template #noComments>
+      <p class="muted">Aún no hay opiniones. Sé el primero en comentar.</p>
+    </ng-template>
+
+    <!-- Formulario para nueva opinión -->
+    <form (ngSubmit)="addComment()" class="new-comment-form">
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input type="text" required [(ngModel)]="newComment.name" name="name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Comentario</ion-label>
+        <ion-textarea required [(ngModel)]="newComment.text" name="text"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Valoración</ion-label>
+        <ion-select [(ngModel)]="newComment.rating" name="rating">
+          <ion-select-option *ngFor="let r of [5,4,3,2,1]" [value]="r">{{r}} ★</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit">Enviar opinión</ion-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Cuadro de contacto debajo de Opiniones -->
+  <div class="contact-card ion-padding">
+    <h2 class="section-subtitle">Contacto</h2>
+    <ion-card>
+      <ion-card-content class="contact-rows">
+        <ion-item lines="none">
+          <div class="contact-value">{{ contact.phone }}</div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <div class="contact-value">{{ contact.email }}</div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <div class="contact-value">{{ contact.location }}</div>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
   </div>
 
 </ion-content>
+

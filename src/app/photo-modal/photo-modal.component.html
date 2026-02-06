@@ -1,0 +1,25 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()">Cerrar</ion-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons slot="end">
+      <ion-button size="small" (click)="zoomOut()">-</ion-button>
+      <ion-button size="small" (click)="resetZoom()">Reset</ion-button>
+      <ion-button size="small" (click)="zoomIn()">+</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="photo-modal-content">
+  <div class="image-container"
+       (pointerdown)="onPointerDown($event)"
+       (pointermove)="onPointerMove($event)"
+       (pointerup)="onPointerUp($event)"
+       (pointercancel)="onPointerUp($event)">
+    <div class="image-wrap" [style.transform]="'translate(' + translateX + 'px,' + translateY + 'px) scale(' + scale + ')'">
+      <img [src]="src" alt="Foto ampliada" draggable="false" />
+    </div>
+  </div>
+</ion-content>

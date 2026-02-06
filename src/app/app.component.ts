@@ -7,5 +7,11 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {
+      // no-op for non-browser environments
+    }
+  }
 }
