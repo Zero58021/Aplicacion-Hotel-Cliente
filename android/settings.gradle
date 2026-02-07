@@ -1,5 +1,11 @@
 include ':app'
-include ':capacitor-cordova-android-plugins'
-project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+
+def cordovaPluginsDir = file('capacitor-cordova-android-plugins')
+if (cordovaPluginsDir.exists()) {
+	include ':capacitor-cordova-android-plugins'
+	project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+} else {
+	println "Note: ${cordovaPluginsDir} not found — skipping inclusion of capaci tor-cordova-android-plugins project."
+}
 
 apply from: 'capacitor.settings.gradle'
