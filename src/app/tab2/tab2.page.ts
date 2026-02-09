@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, ViewChild, QueryList, ElementRef } from '@angular/core';
+import { ModalController, IonContent } from '@ionic/angular';
 import { PhotoModalComponent } from '../photo-modal/photo-modal.component';
 import { RoomDetailComponent } from '../room-detail/room-detail.component';
 import { IonicModule } from '@ionic/angular';
@@ -17,13 +17,13 @@ import { Router } from '@angular/router';
   templateUrl: './tab2.page.html',
   styleUrls: ['./tab2.page.scss'],
 })
-export class Tab2Page implements OnInit, OnDestroy {
+export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
   criteria: SearchCriteria | null = null;
   private sub?: Subscription;
   // Opciones de filtro
   roomTypes = ['Individual', 'Doble', 'Doble individual', 'Triple', 'Suite', 'Familiar'];
-  floors = ['Baja', 'Primera', 'Segunda', 'Tercera', 'Cuarta'];
-  amenitiesOptions = ['Balcón', 'Bañera', 'Cuna', 'Ducha', 'Frigorífico', 'Sin nada', 'Televisión', 'Terraza', 'WiFi'];
+  floors = ['Cualquiera', 'Baja', 'Primera', 'Segunda', 'Tercera', 'Cuarta'];
+  amenitiesOptions = ['Balcón', 'Bañera', 'Cuna', 'Ducha', 'Frigorífico', 'Televisión', 'Terraza', 'WiFi', 'Limpieza', 'Silla de ruedas', 'Toallas extras'];
 
   // Selecciones actuales
   selectedRoomType: string | null = null;
@@ -35,20 +35,24 @@ export class Tab2Page implements OnInit, OnDestroy {
   // Lista de habitaciones de ejemplo (puedes sustituir por datos reales/servicio)
   // Fuente de datos de habitaciones (vacía por defecto — conecta con tu servicio/API)
   rooms: any[] = [
-    { id: 1, name: 'Individual Económica', type: 'Individual', floor: 'Baja', amenities: ['WiFi'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/2.jpg'], favorite: false, price: 47, oldPrice: 79, rating: 3, location: 'Centro histórico', distance: '0.8 km' },
-    { id: 2, name: 'Doble Con Balcón', type: 'Doble', floor: 'Primera', amenities: ['Balcón','Televisión'], photos: ['assets/fotosInicio/2.jpg','assets/fotosInicio/3.jpg'], favorite: false, price: 69, oldPrice: 99, rating: 4, location: 'Zona comercial', distance: '1.2 km' },
-    { id: 3, name: 'Suite Familiar', type: 'Suite', floor: 'Segunda', amenities: ['Terraza','Frigorífico','Televisión'], photos: ['assets/fotosInicio/3.jpg','assets/fotosInicio/4.jpg'], favorite: false, price: 129, oldPrice: 159, rating: 5, location: 'Vistas al río', distance: '0.4 km' },
-    { id: 4, name: 'Triple Estándar', type: 'Triple', floor: 'Tercera', amenities: ['Ducha','Cuna','WiFi'], photos: ['assets/fotosInicio/4.jpg','assets/fotosInicio/5.jpg'], favorite: false, price: 89, oldPrice: 119, rating: 4, location: 'Cerca estación', distance: '2.0 km' },
-    { id: 5, name: 'Doble Individual Superior', type: 'Doble individual', floor: 'Cuarta', amenities: ['Bañera','Televisión'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/1.webp'], favorite: false, price: 79, oldPrice: 109, rating: 4, location: 'Barrio tranquilo', distance: '3.5 km' },
-    { id: 6, name: 'Familiar Plus', type: 'Familiar', floor: 'Primera', amenities: ['Terraza','Balcón','Frigorífico'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/3.jpg'], favorite: false, price: 139, oldPrice: 179, rating: 5, location: 'Suburbio', distance: '5.1 km' },
-    { id: 7, name: 'Individual Con Terraza', type: 'Individual', floor: 'Segunda', amenities: ['Terraza','WiFi'], photos: ['assets/fotosInicio/2.jpg'], favorite: false, price: 59, oldPrice: 79, rating: 3, location: 'Centro histórico', distance: '0.9 km' },
-    { id: 8, name: 'Suite Junior', type: 'Suite', floor: 'Tercera', amenities: ['Balcón','Televisión','Frigorífico'], photos: ['assets/fotosInicio/3.jpg'], favorite: false, price: 119, oldPrice: 149, rating: 5, location: 'Vistas al río', distance: '0.6 km' },
-    { id: 9, name: 'Doble Económica', type: 'Doble', floor: 'Baja', amenities: ['Ducha','WiFi'], photos: ['assets/fotosInicio/4.jpg'], favorite: false, price: 49, oldPrice: 69, rating: 3, location: 'Zona comercial', distance: '1.8 km' },
-    { id: 10, name: 'Familiar Estándar', type: 'Familiar', floor: 'Cuarta', amenities: ['Cuna','Frigorífico'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/2.jpg'], favorite: false, price: 99, oldPrice: 129, rating: 4, location: 'Barrio tranquilo', distance: '4.0 km' }
+    { id: 1, name: 'Individual Económica', type: 'Individual', floor: 'Baja', amenities: ['WiFi'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/2.jpg'], favorite: false, price: 47, oldPrice: 79, rating: 0},
+    { id: 2, name: 'Doble Con Balcón', type: 'Doble', floor: 'Primera', amenities: ['Balcón','Televisión'], photos: ['assets/fotosInicio/2.jpg','assets/fotosInicio/3.jpg'], favorite: false, price: 69, oldPrice: 99, rating: 0},
+    { id: 3, name: 'Suite Familiar', type: 'Suite', floor: 'Segunda', amenities: ['Terraza','Frigorífico','Televisión'], photos: ['assets/fotosInicio/3.jpg','assets/fotosInicio/4.jpg'], favorite: false, price: 129, oldPrice: 159, rating: 0},
+    { id: 4, name: 'Triple Estándar', type: 'Triple', floor: 'Tercera', amenities: ['Ducha','Cuna','WiFi'], photos: ['assets/fotosInicio/4.jpg','assets/fotosInicio/5.jpg'], favorite: false, price: 89, oldPrice: 119, rating: 0},
+    { id: 5, name: 'Doble Individual Superior', type: 'Doble individual', floor: 'Cuarta', amenities: ['Bañera','Televisión'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/1.webp'], favorite: false, price: 79, oldPrice: 109, rating: 0},
+    { id: 6, name: 'Familiar Plus', type: 'Familiar', floor: 'Primera', amenities: ['Terraza','Balcón','Frigorífico'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/3.jpg'], favorite: false, price: 139, oldPrice: 179, rating: 0},
+    { id: 7, name: 'Individual Con Terraza', type: 'Individual', floor: 'Segunda', amenities: ['Terraza','WiFi'], photos: ['assets/fotosInicio/2.jpg'], favorite: false, price: 59, oldPrice: 79, rating: 0},
+    { id: 8, name: 'Suite Junior', type: 'Suite', floor: 'Tercera', amenities: ['Balcón','Televisión','Frigorífico'], photos: ['assets/fotosInicio/3.jpg'], favorite: false, price: 119, oldPrice: 149, rating: 0},
+    { id: 9, name: 'Doble Económica', type: 'Doble', floor: 'Baja', amenities: ['Ducha','WiFi'], photos: ['assets/fotosInicio/4.jpg'], favorite: false, price: 49, oldPrice: 69, rating: 0},
+    { id: 10, name: 'Familiar Estándar', type: 'Familiar', floor: 'Cuarta', amenities: ['Cuna','Frigorífico'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/2.jpg'], favorite: false, price: 99, oldPrice: 129, rating: 0 }
   ];
 
   filteredRooms = this.rooms.slice();
   @ViewChildren('albumContainer') albumContainers!: QueryList<ElementRef<HTMLDivElement>>;
+  @ViewChild(IonContent) content!: IonContent;
+
+  // Mostrar/ocultar botón para volver arriba
+  showScrollTop = false;
 
   // per-container state maps (copied from Tab1 for identical album behaviour)
   private intervalMap = new Map<HTMLElement, any>();
@@ -73,6 +77,8 @@ export class Tab2Page implements OnInit, OnDestroy {
     });
     // cargar favoritos guardados
     this.loadFavorites();
+    // calcular valoraciones a partir de opiniones guardadas
+    this.computeRatingsFromReviews();
   }
 
   starsArray(n: number) {
@@ -118,6 +124,32 @@ export class Tab2Page implements OnInit, OnDestroy {
       initialBreakpoint: 0.6
     });
     await modal.present();
+    // cuando se cierre el modal, recalcular valoraciones por si se añadió una opinión
+    modal.onDidDismiss().then(() => this.computeRatingsFromReviews());
+  }
+
+  // Construye la key usada en RoomDetailComponent para almacenar las opiniones
+  private reviewsStorageKeyFor(roomId: number | string) {
+    return `roomReviews_tab2_${roomId}`;
+  }
+
+  // Lee las opiniones de localStorage y calcula la media para cada habitación
+  computeRatingsFromReviews() {
+    this.rooms.forEach(r => {
+      try {
+        const raw = localStorage.getItem(this.reviewsStorageKeyFor(r.id));
+        if (!raw) return; // no hay opiniones, dejamos la rating actual
+        const reviews = JSON.parse(raw) as Array<{ rating: number }>;
+        if (!Array.isArray(reviews) || reviews.length === 0) return;
+        const sum = reviews.reduce((acc, cur) => acc + (Number(cur.rating) || 0), 0);
+        const avg = sum / reviews.length;
+        r.rating = avg; // almacenamos la media (puede ser decimal)
+      } catch (e) {
+        console.warn('No se pudieron leer las opiniones para la habitación', r.id, e);
+      }
+    });
+    // si hay filtros aplicados, volver a filtrar para reflejar cambios
+    this.applyFilters();
   }
 
   ngAfterViewInit(): void {
@@ -237,6 +269,22 @@ export class Tab2Page implements OnInit, OnDestroy {
   goToTab1(ev?: Event) {
     if (ev) ev.stopPropagation();
     this.router.navigateByUrl('/tabs/tab1');
+  }
+
+  // Maneja el evento de scroll del IonContent para mostrar/ocultar el botón
+  onScroll(ev: any) {
+    const y = ev?.detail?.scrollTop ?? 0;
+    this.showScrollTop = y > 300;
+  }
+
+  // Scroll suave hacia arriba
+  scrollToTop() {
+    try {
+      this.content?.scrollToTop(300);
+    } catch (e) {
+      // fallback: usar window
+      window.scrollTo({ top: 0, behavior: 'smooth' } as any);
+    }
   }
 
   public nextSlideFromEvent(ev: Event, skipAnimation = false) {

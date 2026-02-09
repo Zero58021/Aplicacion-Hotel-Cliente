@@ -1,4 +1,4 @@
-<ion-content class="tab2-content" fullscreen>
+<ion-content #pageContent class="tab2-content" fullscreen (ionScroll)="onScroll($event)" [scrollEvents]="true">
   <div class="ion-padding">
     <ng-container *ngIf="criteria; else noCriteria">
       <ion-item lines="none" class="reservation-summary">
@@ -128,6 +128,11 @@
     
   </div>
   <div class="bottom-spacer" aria-hidden="true"></div>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="scroll-top-fab-wrapper" [class.visible]="showScrollTop" [attr.aria-hidden]="!showScrollTop">
+    <ion-fab-button class="scroll-top-fab" (click)="scrollToTop()" [attr.aria-hidden]="!showScrollTop" [disabled]="!showScrollTop">
+      <ion-icon name="arrow-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
   <div class="bottom-left-button">
     <ion-button fill="outline" (click)="goToTab1($event)">Anterior</ion-button>
   </div>

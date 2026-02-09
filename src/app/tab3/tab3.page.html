@@ -1,10 +1,4 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Reserva - Habitación seleccionada</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" scrollEvents="true" (ionScroll)="onContentScroll($event)">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Habitación seleccionada</ion-title>
@@ -12,32 +6,172 @@
   </ion-header>
 
   <div class="ion-padding">
+    <ng-template #noCriteria></ng-template>
     <ng-container *ngIf="selectedRoom; else noSelection">
-      <ion-card>
-        <img [src]="selectedRoom.photos && selectedRoom.photos.length ? selectedRoom.photos[0] : 'assets/fotosInicio/1.webp'" alt="Foto">
-        <ion-card-header>
-          <ion-card-title>{{ selectedRoom.name }}</ion-card-title>
-          <ion-card-subtitle>{{ selectedRoom.type }} · {{ selectedRoom.floor }} · {{ selectedRoom.location }}</ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <div>
-            <strong>Valoración:</strong>
-            <ng-container *ngFor="let _ of (selectedRoom.rating ? [].constructor(selectedRoom.rating) : [])">
-              ★
-            </ng-container>
-            <ng-container *ngIf="!selectedRoom.rating">Sin valoración</ng-container>
+      <ion-card class="selection-card">
+          <div class="selection-inner">
+            <div class="room-thumb">
+              <img [src]="selectedRoom.photos && selectedRoom.photos.length ? selectedRoom.photos[0] : 'assets/fotosInicio/1.webp'" alt="Foto" />
+            </div>
+
+            <div class="room-info">
+              <div class="room-title">{{ selectedRoom.name }}</div>
+              <div class="room-sub">{{ selectedRoom.type }} · {{ selectedRoom.floor }}</div>
+              <div class="room-meta">
+                <div class="rating">
+                  <ng-container *ngFor="let _ of (selectedRoom.rating ? [].constructor(selectedRoom.rating) : [])">★</ng-container>
+                  <ng-container *ngIf="!selectedRoom.rating">Sin valoración</ng-container>
+                </div>
+                <div class="price"><strong>Precio:</strong> Con Prime {{ selectedRoom.price }} € <span class="old">{{ selectedRoom.oldPrice }} €</span></div>
+                <div class="extras"><strong>Extras:</strong> {{ selectedRoom.amenities && selectedRoom.amenities.length ? selectedRoom.amenities.join(', ') : 'Sin extras' }}</div>
+              </div>
+            </div>
+
+            <div class="reservation">
+              <ng-container *ngIf="criteria; else smallNoCriteria">
+                <div class="res-title">Reserva</div>
+                <div class="res-dates">{{ criteria?.checkin | date:'shortDate' }} ➜ {{ criteria?.checkout | date:'shortDate' }}</div>
+                <div class="res-meta">{{ criteria?.adults }} Adultos · {{ criteria?.children }} Niños · {{ criteria?.rooms }} Hab · {{ criteria?.pets ? 'Mascotas' : 'Sin mascotas' }}</div>
+                <div class="res-actions">
+                  <ion-button fill="clear" size="small" (click)="editReservation($event)">Editar</ion-button>
+                </div>
+              </ng-container>
+              <ng-template #smallNoCriteria>
+                <div class="res-title muted">Sin criterios</div>
+              </ng-template>
+            </div>
           </div>
-          <div style="margin-top:8px"><strong>Precio:</strong> {{ selectedRoom.price }} € (antes {{ selectedRoom.oldPrice }} €)</div>
-          <div style="margin-top:8px"><strong>Ubicación:</strong> {{ selectedRoom.location }} · {{ selectedRoom.distance }}</div>
-        </ion-card-content>
       </ion-card>
     </ng-container>
     <ng-template #noSelection>
       <div>No hay ninguna habitación seleccionada. Ve a la pestaña de habitaciones y pulsa "Seleccionar".</div>
     </ng-template>
   </div>
+  <ion-card class="passengers-card">
+    <ion-card-header>
+      <ion-card-title>Pensiones</ion-card-title>
+      <ion-card-subtitle>Elige la pensión que prefieras</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-radio-group [(ngModel)]="selectedPensionId" (ionChange)="onPensionChange($event)">
+          <ion-item *ngFor="let p of pensions">
+            <ion-radio slot="start" [value]="p.id"></ion-radio>
+            <ion-label>
+              <h3>{{ p.name }} — {{ p.price }} €</h3>
+              <p>{{ p.includes && p.includes.length ? p.includes.join(', ') : 'Sin información' }}</p>
+            </ion-label>
+            <ion-note slot="end" color="primary" *ngIf="selectedPensionId === p.id">Seleccionada</ion-note>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-card class="pensions-card">
+    <ion-card-header>
+      <ion-card-title>Personas</ion-card-title>
+      <ion-card-subtitle>Información de los ocupantes de la reserva</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="people-actions">
+        <ion-button color="primary" fill="outline" *ngIf="!formVisible" (click)="togglePassengers()">Añadir personas</ion-button>
+        <ion-button color="danger" fill="clear" *ngIf="formVisible" (click)="togglePassengers()">Ocultar</ion-button>
+      </div>
+
+      <div *ngIf="formVisible" class="passengers-list">
+        <div *ngIf="passengers.length === 0" class="empty-note">No hay pasajeros añadidos.</div>
+
+        <div *ngFor="let p of passengers; let i = index" class="passenger-form" id="passenger-{{i}}">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ p.isPrimary ? 'Titular' : ('Pasajero ' + (i + 1)) }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item>
+                <ion-label position="stacked">Nombre</ion-label>
+                <ion-input [(ngModel)]="p.name" placeholder="Nombre"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Apellidos</ion-label>
+                <ion-input [(ngModel)]="p.lastName" placeholder="Apellidos"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Tipo</ion-label>
+                <ion-segment [(ngModel)]="p.type">
+                  <ion-segment-button value="adult">Adulto</ion-segment-button>
+                  <ion-segment-button value="child">Niño</ion-segment-button>
+                </ion-segment>
+              </ion-item>
+
+              <ion-item *ngIf="p.isPrimary">
+                <ion-label position="stacked">Teléfono</ion-label>
+                <ion-input type="tel" [(ngModel)]="p.phone" placeholder="Teléfono"></ion-input>
+              </ion-item>
+
+              <ion-item *ngIf="p.isPrimary">
+                <ion-label position="stacked">Correo</ion-label>
+                <ion-input type="email" [(ngModel)]="p.email" placeholder="Correo"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">DNI</ion-label>
+                <ion-input [(ngModel)]="p.dni" placeholder="DNI"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Alergias</ion-label>
+                <ion-input [(ngModel)]="p.allergies" placeholder="Alergias (si tiene)"></ion-input>
+              </ion-item>
+
+              <div class="form-actions">
+                <ion-button color="danger" fill="clear" size="small" (click)="removePassenger(i)">Eliminar</ion-button>
+              </div>
+              </ion-card-content>
+          </ion-card>
+        </div>
+
+        <div class="add-buttons">
+          <ion-button color="primary" (click)="addPrimary()" *ngIf="!hasPrimary()">Añadir titular</ion-button>
+          <ion-button color="secondary" (click)="addPassenger()" [disabled]="!hasPrimary()">Añadir otro pasajero</ion-button>
+        </div>
+
+        <div class="save-action">
+          <ion-button color="success" expand="block" fill="solid" (click)="savePassengers()" [disabled]="passengers.length===0">GUARDAR</ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="passengers.length > 0" class="passengers-summary">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Lista de pasajeros</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let p of passengers; let i = index">
+                <ion-label>
+                  <h3>{{ p.name }} {{ p.lastName }}</h3>
+                  <p>{{ p.type === 'adult' ? 'Adulto' : 'Niño' }} · DNI: {{ p.dni || '—' }}</p>
+                </ion-label>
+                <ion-buttons slot="end">
+                  <ion-button fill="clear" size="small" (click)="editPassenger(i)">Editar</ion-button>
+                  <ion-button color="danger" fill="clear" size="small" (click)="removePassenger(i)">Eliminar</ion-button>
+                </ion-buttons>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="page-bottom-spacer"></div>
+
   <div class="bottom-left-button">
     <ion-button fill="outline" (click)="goToTab2($event)">Anterior</ion-button>
   </div>
-
+  <div class="bottom-right-button" [class.visible]="showProceed">
+    <ion-button color="primary" fill="solid" (click)="proceedToPayment($event)">PROCEDER CON EL PAGO</ion-button>
+  </div>
 </ion-content>
