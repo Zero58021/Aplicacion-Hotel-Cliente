@@ -1,13 +1,73 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>tab5</ion-title>
+    <ion-title>Mis reservas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">tab5</ion-title>
+      <ion-title size="large">Mis reservas</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pullingIcon="arrow-dropdown" refreshingSpinner="circles"></ion-refresher-content>
+  </ion-refresher>
+  <ion-content>
+    <div class="reservations-container">
+      <ion-list *ngIf="reservations && reservations.length; else empty">
+        <ion-item lines="none" *ngFor="let res of reservations; let i = index" class="reservation-item">
+          <ion-card class="reservation-card" [class.cancelled]="res.estado === 'Cancelada'">
+            <ion-card-header class="card-header">
+              <div class="header-left">
+                <ion-card-title class="name">{{ res.nombreCliente }}</ion-card-title>
+                <ion-card-subtitle class="meta" [ngClass]="{ 'cancelada': res.estado === 'Cancelada' }">{{ res.id }} · {{ res.estado }}</ion-card-subtitle>
+              </div>
+              <div class="header-right">
+                <ion-button fill="clear" color="primary" size="small" (click)="openInfo(res)" title="Info">
+                  <ion-icon name="information-circle"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="warning" size="small" (click)="cancelReservation(i)" *ngIf="res.estado !== 'Cancelada'">
+                  <ion-icon name="close-circle"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="medium" size="small" (click)="deleteReservation(i)">
+                  <ion-icon name="trash"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-card-header>
+            <ion-card-content class="card-content">
+              <div class="row">
+                <div class="col">
+                  <div class="label">Entrada</div>
+                  <div class="value">{{ res.fechaEntrada | date:'mediumDate' }}</div>
+                </div>
+                <div class="col">
+                  <div class="label">Salida</div>
+                  <div class="value">{{ res.fechaSalida | date:'mediumDate' }} ({{ getNights(res) }} noches)</div>
+                </div>
+              </div>
+              <div class="row small details">
+                <div class="col"><strong>Hab:</strong> {{ res.selectedRoom?.name || '-' }}</div>
+                <div class="col"><strong>Pensión:</strong> {{ res.selectedPension?.name || '-' }}</div>
+              </div>
+              <div class="row small">
+                <div class="col"><strong>Hab.</strong> {{ res.habitaciones }}</div>
+                <div class="col"><strong>Adultos</strong> {{ res.adults ?? res.pax ?? '-' }}</div>
+                <div class="col"><strong>Niños</strong> {{ res.children ?? 0 }}</div>
+                <div class="col value-right"><strong>Total</strong> {{ displayTotal(res) | currency:'EUR' }}</div>
+              </div>
+              <div class="extra">
+                <div *ngIf="res.email"><ion-icon name="mail" slot="start"></ion-icon> {{ res.email }}</div>
+                <div *ngIf="res.telefono"><ion-icon name="call" slot="start"></ion-icon> {{ res.telefono }}</div>
+                <div *ngIf="res.notas" class="notes"><ion-icon name="document" slot="start"></ion-icon> {{ res.notas }}</div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-item>
+      </ion-list>
+    <ng-template #empty>
+      <div class="empty">Aún no hay reservas.</div>
+    </ng-template>
+    </div>
+  </ion-content>
 </ion-content>

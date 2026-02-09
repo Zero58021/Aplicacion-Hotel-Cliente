@@ -68,6 +68,14 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     this.adultsOptions = Array.from({ length: 20 }, (_, i) => i + 1);
     this.childrenOptions = Array.from({ length: 41 }, (_, i) => i); // 0..40
     this.roomsOptions = Array.from({ length: 15 }, (_, i) => i + 1);
+    // inicializar fechas por defecto: hoy (entrada) y mañana (salida)
+    const today = new Date();
+    const inDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const outDate = new Date(inDate);
+    outDate.setDate(outDate.getDate() + 1);
+    this.checkinDate = inDate.toISOString();
+    this.checkoutDate = outDate.toISOString();
+
     // publish initial criteria
     this.updateCriteria();
   }

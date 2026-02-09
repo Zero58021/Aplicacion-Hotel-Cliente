@@ -1,13 +1,102 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>tab4</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">tab4</ion-title>
+      <ion-title size="large">Resumen de reserva</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-grid>
+    <!-- Resumen de costos -->
+  </ion-grid>
+
+  <div class="center-container">
+    <ion-grid>
+      <ion-row class="ion-justify-content-center">
+        <ion-col size="12" size-md="8" size-lg="4">
+          <ion-card class="summary-card">
+          <ion-card-header>
+            <ion-card-title>Reserva</ion-card-title>
+            <div class="summary-actions">
+              <ion-button fill="clear" size="small" (click)="openInfo($event)">Info</ion-button>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="summary-line">
+              <div class="label"><strong>Habitación:</strong></div>
+              <div class="value">
+                <span *ngIf="selectedRoom">
+                  <ng-container *ngIf="nights > 0; else perNightRoom">
+                    {{ roomCost | number:'1.2-2' }} € <small>({{ nights }} noches)</small>
+                  </ng-container>
+                  <ng-template #perNightRoom>
+                      {{ (selectedRoom.price * (criteria?.rooms || 1)) | number:'1.2-2' }} € <small>(por noche total)</small>
+                    </ng-template>
+                </span>
+                <span *ngIf="!selectedRoom">—</span>
+              </div>
+            </div>
+            <div class="summary-line">
+              <div class="label"><strong>Pensión:</strong></div>
+              <div class="value">
+                <span *ngIf="selectedPension">
+                  <ng-container *ngIf="nights > 0; else perDayPension">
+                    {{ pensionCost | number:'1.2-2' }} €
+                  </ng-container>
+                  <ng-template #perDayPension>
+                    {{ ( (selectedPension.price || 0) * ((criteria?.adults || 0) + (criteria?.children || 0)) ) | number:'1.2-2' }} € <small>(por día total)</small>
+                  </ng-template>
+                </span>
+                <span *ngIf="!selectedPension">—</span>
+              </div>
+            </div>
+            <hr class="summary-sep" />
+            <div class="summary-total summary-line">
+              <div class="label"><strong>Total:</strong></div>
+              <div class="value">
+                <span *ngIf="(selectedRoom || selectedPension)">
+                  <ng-container *ngIf="nights > 0; else perNightTotal">
+                    {{ totalCost | number:'1.2-2' }} €
+                  </ng-container>
+                  <ng-template #perNightTotal>
+                      {{ ( ((selectedRoom?.price || 0) * (criteria?.rooms || 1)) + ((selectedPension?.price || 0) * ((criteria?.adults || 0) + (criteria?.children || 0))) ) | number:'1.2-2' }} € <small>(por noche/día)</small>
+                    </ng-template>
+                </span>
+                <span *ngIf="!selectedRoom && !selectedPension">—</span>
+              </div>
+            </div>
+            </ion-card-content>
+          </ion-card>
+
+          <div class="center-actions">
+            <div class="payment-options">
+              <ion-segment [(ngModel)]="paymentMethod" value="online" class="payment-segment">
+                <ion-segment-button value="online">Pago online</ion-segment-button>
+                <ion-segment-button value="inperson">Pago físico</ion-segment-button>
+              </ion-segment>
+            </div>
+
+            <ion-button class="finalize-btn" expand="block" color="primary" (click)="finalizePayment($event)">FINALIZAR PAGO</ion-button>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
 </ion-content>
+
+<!-- Success overlay with animated tick -->
+<div class="success-overlay" *ngIf="paymentSuccess">
+  <div class="success-card" role="status" aria-live="polite">
+    <svg class="checkmark" viewBox="0 0 52 52">
+      <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+      <path class="checkmark__check" fill="none" d="M14 27 l8 8 l16 -16" />
+    </svg>
+    <div class="success-text">Pago confirmado</div>
+  </div>
+</div>
+
+  <div class="page-bottom-spacer"></div>
+
+  <div class="bottom-left-button">
+    <ion-button fill="outline" (click)="goToTab3($event)">ANTERIOR</ion-button>
+  </div>

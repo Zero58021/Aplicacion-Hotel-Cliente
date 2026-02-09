@@ -7,17 +7,12 @@ android {
   }
 }
 
-// apply cordova variables if the generated file exists (some projects don't have Cordova plugins)
-def cordovaVars = file("../capacitor-cordova-android-plugins/cordova.variables.gradle")
-if (cordovaVars.exists()) {
-  apply from: cordovaVars
-} else {
-  // no-op: cordova.variables.gradle not present
-}
+apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
     implementation project(':capacitor-app')
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
+    implementation project(':capacitor-preferences')
     implementation project(':capacitor-status-bar')
 
 }

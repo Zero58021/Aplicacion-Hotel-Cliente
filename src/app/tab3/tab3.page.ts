@@ -42,7 +42,7 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.criteriaSub = this.searchService.criteria$.subscribe(c => this.criteria = c);
     try {
       const sp = localStorage.getItem('selectedPension');
-      if (sp) this.selectedPensionId = sp;
+      if (sp !== null) this.selectedPensionId = sp;
       const ps = localStorage.getItem('reservationPassengers');
       if (ps) {
         const parsed = JSON.parse(ps) || [];
@@ -69,7 +69,7 @@ export class Tab3Page implements OnInit, OnDestroy {
   onPensionChange(ev: any) {
     const id = ev && ev.detail ? ev.detail.value : ev;
     this.selectedPensionId = id;
-    try { localStorage.setItem('selectedPension', id); } catch (e) { }
+    try { localStorage.setItem('selectedPension', String(id)); } catch (e) { }
   }
 
   get selectedPension() {
