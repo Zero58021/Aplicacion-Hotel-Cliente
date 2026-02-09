@@ -1,6 +1,8 @@
 import { Component, ViewChildren, ViewChild, QueryList, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { PhotoModalComponent } from '../photo-modal/photo-modal.component';
+import { Router } from '@angular/router';
+import { SearchService } from '../services/search.service';
 
 @Component({
   selector: 'app-tab1',
@@ -59,13 +61,15 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   // store listeners so we can remove them on destroy
   private listenersMap = new Map<HTMLElement, { down: any; up: any; enter: any; leave: any }>();
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(private modalCtrl: ModalController, private router: Router, private searchService: SearchService) {}
 
   ngOnInit(): void {
     // populate option arrays
     this.adultsOptions = Array.from({ length: 20 }, (_, i) => i + 1);
     this.childrenOptions = Array.from({ length: 41 }, (_, i) => i); // 0..40
     this.roomsOptions = Array.from({ length: 15 }, (_, i) => i + 1);
+    // publish initial criteria
+    this.updateCriteria();
   }
 
   // initialize calendar view when opening a picker
@@ -112,10 +116,12 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         this.checkoutDate = iso;
       }
       this.onDatesChange();
+      this.updateCriteria();
       // keep panel open so user can choose checkout if desired; if user wants auto-close, call closePickers()
     } else if (this.activePicker === 'checkout') {
       this.checkoutDate = iso;
       this.onDatesChange();
+      this.updateCriteria();
       // do not close the panel automatically; keep it open for further adjustments per user request
     }
   }
@@ -168,6 +174,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         this.checkoutDate = next.toISOString();
       }
     }
+    this.updateCriteria();
   }
 
   // Ensure checkout is at least the same as checkin when user sets checkin
@@ -214,8 +221,22 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
       rooms: this.rooms,
       pets: this.hasPets
     };
-    console.log('Buscando con criterios:', criteria);
-    // placeholder: aquí podrías navegar a la búsqueda o abrir un modal
+    this.searchService.setCriteria(criteria);
+    // Navegar a la pestaña 2 para mostrar resultados/criterios
+    this.router.navigateByUrl('/tabs/tab2');
+  }
+
+  /** Public: compone y publica criterios actuales al servicio */
+  updateCriteria() {
+    const criteria = {
+      checkin: this.checkinDate,
+      checkout: this.checkoutDate,
+      adults: this.adults,
+      children: this.children,
+      rooms: this.rooms,
+      pets: this.hasPets
+    };
+    this.searchService.setCriteria(criteria);
   }
 
   openCheckin() {

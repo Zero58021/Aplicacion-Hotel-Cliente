@@ -1,0 +1,80 @@
+<ion-content class="room-detail-content">
+  <div class="room-detail-inner">
+    <div class="rd-header">
+      <div class="rd-title">{{ room?.name || 'Habitación' }}</div>
+      <div class="rd-close"><ion-button fill="clear" (click)="close()">Cerrar</ion-button></div>
+    </div>
+
+    <div class="rd-body">
+      <div class="photos">
+        <div class="photos-scroll">
+          <div *ngFor="let p of room?.photos || []" class="photo-item">
+            <img [src]="p" (click)="openPhoto(p)" alt="foto habitacion" />
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Descripción</h3>
+        <p>{{ room?.description || 'Descripción breve de la habitación.' }}</p>
+      </div>
+
+      <div class="section info-grid">
+        <h3>Información</h3>
+        <div class="info-row"><strong>Tipo:</strong> {{ room?.type }}</div>
+        <div class="info-row"><strong>Planta:</strong> {{ room?.floor }}</div>
+        <div class="info-row"><strong>Precio:</strong> {{ room?.price }} €</div>
+        <div class="info-row"><strong>Servicios:</strong>
+          <span *ngFor="let a of room?.amenities; let i = index">{{ a }}<span *ngIf="i < (room?.amenities?.length-1)">, </span></span>
+        </div>
+      </div>
+
+      <div class="section reviews">
+        <h3>Opiniones ({{ reviews.length }})</h3>
+        <ng-container *ngIf="reviews.length; else noReviews">
+          <div *ngFor="let rv of reviews" class="review">
+            <div class="review-header">
+              <div class="review-name">{{ rv.name }}</div>
+              <div class="review-rating">{{ rv.rating }}★</div>
+            </div>
+            <div class="review-date">{{ rv.date | date:'short' }}</div>
+            <div class="review-comment">{{ rv.comment }}</div>
+          </div>
+        </ng-container>
+        <ng-template #noReviews>
+          <div class="no-reviews">No hay opiniones aún. Sé el primero.</div>
+        </ng-template>
+      </div>
+
+      <div class="add-review">
+        <h4>Añadir opinión</h4>
+        <ion-item>
+          <ion-label position="floating">Tu nombre</ion-label>
+          <ion-input [(ngModel)]="newName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Valoración (1-5)</ion-label>
+          <ion-input type="number" [(ngModel)]="newRating"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Comentario</ion-label>
+          <ion-textarea rows="3" [(ngModel)]="newComment"></ion-textarea>
+        </ion-item>
+      </div>
+    </div>
+  </div>
+
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="showScrollTop">
+    <ion-fab-button (click)="scrollToTop()" size="small">
+      <ion-icon name="chevron-up-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-footer class="room-detail-footer" translucent>
+    <ion-toolbar>
+      <div class="footer-inner">
+        <ion-button expand="block" color="primary" (click)="addReview()" [disabled]="!newName || !newComment">Enviar opinión</ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>

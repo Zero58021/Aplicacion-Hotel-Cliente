@@ -53,7 +53,7 @@
               <div class="small-box">
                 <div class="box-label">Adultos</div>
                 <div class="box-value">{{ adults }}</div>
-                <ion-select [(ngModel)]="adults" aria-label="Seleccionar adultos">
+                <ion-select [(ngModel)]="adults" (ionChange)="updateCriteria()" aria-label="Seleccionar adultos">
                   <ion-select-option *ngFor="let n of adultsOptions" [value]="n">{{n}}</ion-select-option>
                 </ion-select>
               </div>
@@ -61,7 +61,7 @@
               <div class="small-box">
                 <div class="box-label">Niños</div>
                 <div class="box-value">{{ children }}</div>
-                <ion-select [(ngModel)]="children" aria-label="Seleccionar niños">
+                <ion-select [(ngModel)]="children" (ionChange)="updateCriteria()" aria-label="Seleccionar niños">
                   <ion-select-option *ngFor="let n of childrenOptions" [value]="n">{{n}}</ion-select-option>
                 </ion-select>
               </div>
@@ -69,7 +69,7 @@
               <div class="small-box">
                 <div class="box-label">Habitaciones</div>
                 <div class="box-value">{{ rooms }}</div>
-                <ion-select [(ngModel)]="rooms" aria-label="Seleccionar habitaciones">
+                <ion-select [(ngModel)]="rooms" (ionChange)="updateCriteria()" aria-label="Seleccionar habitaciones">
                   <ion-select-option *ngFor="let n of roomsOptions" [value]="n">{{n}}</ion-select-option>
                 </ion-select>
               </div>
@@ -79,7 +79,7 @@
                   <div>
                     <div class="box-label">¿Viajas con mascotas?</div>
                   </div>
-                  <ion-toggle [(ngModel)]="hasPets" aria-label="Viajas con mascotas"></ion-toggle>
+                  <ion-toggle [(ngModel)]="hasPets" (ionChange)="updateCriteria()" aria-label="Viajas con mascotas"></ion-toggle>
                 </div>
                 <div class="pets-info">
                   <div class="muted">Los animales de servicio no se consideran mascotas.</div>
@@ -96,7 +96,7 @@
             <div class="small-box" role="button" tabindex="0" (click)="openAdultSelect()">
               <div class="box-label">Adultos</div>
               <div class="box-value">{{ adults }}</div>
-              <ion-select #adultSelect interface="popover" [(ngModel)]="adults" aria-label="Seleccionar adultos">
+              <ion-select #adultSelect interface="popover" [(ngModel)]="adults" (ionChange)="updateCriteria()" aria-label="Seleccionar adultos">
                 <ion-select-option *ngFor="let n of adultsOptions" [value]="n">{{n}}</ion-select-option>
               </ion-select>
             </div>
@@ -104,7 +104,7 @@
             <div class="small-box" role="button" tabindex="0" (click)="openChildSelect()">
               <div class="box-label">Niños</div>
               <div class="box-value">{{ children }}</div>
-              <ion-select #childSelect interface="popover" [(ngModel)]="children" aria-label="Seleccionar niños">
+              <ion-select #childSelect interface="popover" [(ngModel)]="children" (ionChange)="updateCriteria()" aria-label="Seleccionar niños">
                 <ion-select-option *ngFor="let n of childrenOptions" [value]="n">{{n}}</ion-select-option>
               </ion-select>
             </div>
@@ -112,7 +112,7 @@
             <div class="small-box" role="button" tabindex="0" (click)="openRoomSelect()">
               <div class="box-label">Habitaciones</div>
               <div class="box-value">{{ rooms }}</div>
-              <ion-select #roomSelect interface="popover" [(ngModel)]="rooms" aria-label="Seleccionar habitaciones">
+              <ion-select #roomSelect interface="popover" [(ngModel)]="rooms" (ionChange)="updateCriteria()" aria-label="Seleccionar habitaciones">
                 <ion-select-option *ngFor="let n of roomsOptions" [value]="n">{{n}}</ion-select-option>
               </ion-select>
             </div>
@@ -120,7 +120,7 @@
             <div class="small-box pets-row">
               <div class="pets-top">
                 <div class="box-label">¿Viajas con mascotas?</div>
-                <ion-toggle [(ngModel)]="hasPets" aria-label="Viajas con mascotas"></ion-toggle>
+                <ion-toggle [(ngModel)]="hasPets" (ionChange)="updateCriteria()" aria-label="Viajas con mascotas"></ion-toggle>
               </div>
               <div class="pets-info">
                 <div class="muted">Los animales de servicio no se consideran mascotas.</div>

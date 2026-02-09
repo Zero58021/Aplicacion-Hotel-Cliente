@@ -1,0 +1,78 @@
+.room-detail-content { padding: 12px; }
+.room-detail-content { padding: 12px; padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+.photos { height: 220px; margin: 6px 0 12px 0; }
+.photos-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px }
+.photo-item { min-width:320px; height:220px; flex:0 0 auto; border-radius:10px; overflow:hidden }
+.photo-item img { width:100%; height:100%; object-fit:cover; display:block }
+.section { margin-bottom: 12px }
+.info-grid .info-row { margin:6px 0 }
+.reviews .review { border-bottom:1px solid #eee; padding:8px 0 }
+.review-header { display:flex; justify-content:space-between; align-items:center }
+.review-name { font-weight:600 }
+.review-rating { color:#f5b50a }
+.no-reviews { color:#666; font-style:italic }
+.add-review { margin-top:8px }
+
+/* Footer (fixed) styling to keep submit button visible */
+.room-detail-footer {
+	--background: rgba(255,255,255,0.98);
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	box-shadow: 0 -6px 16px rgba(0,0,0,0.08);
+}
+.room-detail-footer .footer-inner {
+	width: 100%;
+	padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+}
+.room-detail-footer ion-button {
+	--border-radius: 10px;
+}
+
+/* Inner constrained window to make modal look narrower */
+.room-detail-inner {
+	max-width: 520px;
+	margin: 0 20px;
+	background: var(--ion-background-color);
+	border-radius: 10px;
+	overflow: visible;
+	box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+	padding-bottom: 8px;
+}
+.rd-header {
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding: 12px 16px;
+	font-size:18px;
+	font-weight:600;
+	background: transparent;
+}
+.rd-title { flex:1 }
+.rd-close ion-button { --padding-start: 0; --padding-end: 0 }
+
+/* Ensure footer inner aligns with inner container */
+.room-detail-footer .footer-inner { max-width:520px; margin: 0 20px; }
+
+@media (max-width:420px) {
+	.room-detail-inner { margin: 0 12px; max-width: calc(100% - 24px); }
+	.room-detail-footer .footer-inner { margin: 0 12px; max-width: calc(100% - 24px); }
+}
+
+/* Scroll behaviour: make body scrollable and header sticky */
+.rd-body {
+	max-height: calc(100vh - 220px);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	padding: 0 12px 12px 12px;
+}
+.rd-header {
+	position: sticky;
+	top: 0;
+	z-index: 12;
+	background: var(--ion-background-color);
+}
+.photos-scroll { -webkit-overflow-scrolling: touch; }
+
+ion-fab {
+	z-index: 30;
+}

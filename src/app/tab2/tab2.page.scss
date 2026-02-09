@@ -1,171 +1,284 @@
-/* Contenedor del buscador con icono */
-.buscador-con-icono {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px; /* Aumentar espacio */
+:host {
+	--ion-background-color: transparent;
 }
 
-/* Icono al lado del buscador */
-.icono-buscador {
-  position: absolute;
-  left: 12px;
-  width: 24px;
-  height: 24px;
-  pointer-events: none;
-  z-index: 10;
+.tab2-content {
+	padding: 12px 12px 24px;
+	background: #f3f5f7;
+	min-height: 100%;
 }
 
-/* Ajuste para que el texto no tape el icono */
-ion-searchbar {
-  width: 100%;
-  padding-left: 35px;
-  --background: var(--ion-background-color);
-  --color: var(--ion-text-color);
+.filters-container {
+	margin-bottom: 12px;
 }
 
-/* Estilo para los filtros (select de rango y tipo) */
+.results-header {
+	margin: 8px 0 12px;
+}
+.results-header .count {
+	font-weight: 700;
+	color: #16394a;
+}
+
+.rooms-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.room-card {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 6px 18px rgba(12, 35, 46, 0.06);
+	overflow: hidden;
+	cursor: pointer;
+	align-items: stretch;
+}
+
+.room-image {
+	width: 100%;
+	height: 220px;
+	overflow: hidden;
+}
+.room-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.room-content {
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex: 1 1 auto;
+}
+
+.room-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.room-header .title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #0b4860;
+}
+.favorite {
+	color: #e74c3c;
+	font-size: 18px;
+	opacity: 0.95;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	transition: background .15s ease;
+	cursor: pointer;
+}
+.favorite ion-icon {
+	font-size: 18px;
+	color: #e74c3c;
+}
+.favorite:hover { background: rgba(233,76,60,0.06); }
+
+.meta {
+	display: flex;
+	flex-direction: column;
+	font-size: 13px;
+	color: #6b6b6b;
+}
+.meta .stars {
+	color: #f1b24a;
+	margin-bottom: 4px;
+}
+
+.badges {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-top: 4px;
+}
+.badge {
+	background: #eaf8f1;
+	color: #0a7a57;
+	border-radius: 100px;
+	padding: 4px 8px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.price-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-top: 6px;
+}
+.price-left {
+	display: flex;
+	flex-direction: column;
+}
+.old-price {
+	text-decoration: line-through;
+	color: #b0b0b0;
+	font-size: 13px;
+}
+.price {
+	font-size: 20px;
+	font-weight: 800;
+	color: #d9383a;
+	margin-top: 2px;
+}
+.tax {
+	font-size: 11px;
+	color: #7a7a7a;
+}
+
+.price-right {
+	text-align: right;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.tag {
+	background: #eaf8f1;
+	color: #0a7a57;
+	padding: 6px 8px;
+	border-radius: 8px;
+	font-weight: 700;
+	font-size: 13px;
+}
+.login-link {
+	color: #0a6fb5;
+	font-weight: 700;
+	text-decoration: underline;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.footer-note {
+	font-size: 12px;
+	color: #9a9a9a;
+	margin-top: 8px;
+}
+
+.no-rooms {
+	padding: 24px;
+	text-align: center;
+	color: #666;
+}
+
+@media (max-width: 700px) {
+	.room-image { height: 160px; }
+}
+
+.bottom-spacer {
+	height: calc(28px + env(safe-area-inset-bottom));
+	min-height: 28px;
+	width: 100%;
+}
+
+:host {
+	--primary-green: #2e7d32;
+	--primary-green-600: #388e3c;
+	--light-green: #e8f5e9;
+}
+
 ion-item {
-  margin-bottom: 20px; /* Aumentar espacio entre filtros */
+	border-radius: 10px;
+	background: linear-gradient(90deg, var(--light-green), #fff);
+	box-shadow: 0 2px 8px rgba(46,125,50,0.12);
+	margin: 12px 0;
 }
 
-/* Estilo del select para filtros */
-ion-select {
-  width: 100%;
-  --padding-start: 10px;
-  --background: var(--ion-background-color); /* Fondo claro */
-  --border-radius: 8px;
-  --box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+ion-item h3 {
+	margin: 0 0 4px 0;
+	color: var(--primary-green-600);
 }
 
-/* Mejorar el diseño del botón personalizado */
-.boton-personalizado {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background: transparent !important;
-  font-weight: bold;
-  color: var(--mi-boton-texto) !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  --box-shadow: none !important;
-  --background-focused: transparent !important;
-  --background-activated: transparent !important;
-  --background-hover: transparent !important;
-  --background: transparent !important;
+ion-item p {
+		margin: 0;
+		color: #2f4f2f;
+		font-size: 0.95rem;
 }
 
-.boton-personalizado ion-label {
-  color: var(--mi-boton-texto) !important;
+/* Reservation summary specific spacing */
+.reservation-summary {
+	--padding-start: 14px;
+	--padding-end: 14px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.reservation-summary ion-label {
+	display: block;
+}
+.reservation-summary .reservation-dates {
+	margin: 0 0 6px 0;
+	font-weight: 700;
+	font-size: 1rem;
+	color: #16394a;
+}
+.reservation-summary .reservation-meta {
+	margin: 0;
+	color: #3d5a56;
+	font-size: 0.95rem;
+	line-height: 1.4;
 }
 
-/* Estilo de la imagen dentro del botón */
-.icono-boton {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-  object-fit: cover;
-  border-radius: 6px;
+ion-button[fill="clear"] {
+	color: var(--primary-green-600);
 }
 
-/* Contenedor botón + tabla */
-.tabla-container {
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.muted {
+	color: rgba(0,0,0,0.45);
 }
 
-/* Contenido tabla */
-.contenido-tabla {
-  margin-top: 10px;
-  margin-bottom: 20px;
+/* Compact filter styles */
+.filters-container ion-item.compact {
+	--padding-start: 8px;
+	--padding-end: 8px;
+	height: 44px;
+	align-items: center;
+	margin: 6px 0;
+	background: transparent;
+	box-shadow: none;
+	border-radius: 8px;
+	padding-left: 6px;
+}
+.filters-container ion-item.compact ion-icon {
+	font-size: 18px;
+	color: #0a6fb5;
+	margin-right: 8px;
+}
+.filters-container ion-item.compact ion-label {
+	font-size: 13px;
+	color: #16394a;
+	margin-right: 6px;
+}
+.filters-container ion-select {
+	--min-width: 110px;
+	font-size: 13px;
 }
 
-/* Imagen centrada */
-.imagen-centro {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+/* Fixed bottom-left navigation button */
+.bottom-left-button {
+	position: fixed;
+	left: 12px;
+	/* lower the button significantly so it overlaps the tab bar more */
+	bottom: calc(env(safe-area-inset-bottom) - 40px);
+	z-index: 14000;
+	transform: translateY(7px);
+}
+.bottom-left-button ion-button {
+	min-width: 96px;
+	border-radius: 24px;
+	--background: #ffffff;
+	color: #2e7d32;
+	--border-color: #2e7d32;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-.imagen-centro ion-img {
-  max-width: 80%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* Estilo de la tabla de filas */
-.tabla-personalizada ion-item {
-  --border-width: 0 !important;
-  border-bottom: 1px solid var(--color-tabla-linea) !important;
-  color: var(--color-tabla-texto);
-  --background: transparent !important;
-}
-
-/* Mejoras para la tarjeta de Yo-kai */
-.yokai-container {
-  margin-bottom: 15px;
-  border: 1px solid var(--ion-border-color);
-  border-radius: 15px; /* Bordes más redondeados */
-  padding: 15px;
-  background-color: var(--ion-background-color);
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.yokai-container:hover {
-  background-color: var(--ion-item-hover-background-color);
-  transform: translateY(-5px);
-}
-
-.yokai-container.selected {
-  background-color: var(--ion-item-selected-background-color);
-  border-color: #007bff;
-}
-
-.yokai-container ion-label h2 {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: var(--ion-text-color);
-  margin-bottom: 10px;
-  border-radius: 8px; /* Bordes redondeados alrededor del nombre del Yo-kai */
-  padding: 8px; /* Espacio adicional alrededor del texto */
-}
-
-/* Estilo para los detalles dentro de las tarjetas de Yo-kai */
-.detalle-card ion-card-content p {
-  font-size: 14px;
-  color: var(--ion-text-color);
-  margin-bottom: 5px;
-  border-radius: 8px; /* Bordes redondeados en los párrafos */
-}
-
-.detalle-card ion-card-content h3 {
-  font-weight: bold;
-  color: var(--ion-text-color);
-}
-
-/* Redondeo para las imágenes dentro de las tarjetas de Yo-kai */
-.detalle-card ion-img {
-  border-radius: 10px; /* Bordes redondeados en las imágenes dentro de las tarjetas */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  margin-top: 10px;
-}
-
-/* Tarjetas de habilidades y otros detalles dentro del Yo-kai */
-ion-card {
-  margin-top: 10px;
-  background-color: var(--ion-background-color);
-  border-radius: 10px; /* Bordes redondeados en las tarjetas internas */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo general de los ítems dentro de las tarjetas */
-.detalle-card ion-item {
-  font-size: 14px;
-  margin-bottom: 10px;
-  border-radius: 8px; /* Bordes redondeados en los ítems dentro de la tarjeta */
-}

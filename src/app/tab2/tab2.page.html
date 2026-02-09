@@ -1,159 +1,135 @@
-<ion-content [fullscreen]="true">
-  <!-- Refrescar los datos al tirar hacia abajo -->
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content
-      pullingIcon="sync"
-      pullingText="Llama a Whisper para buscar nuevos Yo-kai..."
-      refreshingText="Buscando Yo-kais...">
-    </ion-refresher-content>
-  </ion-refresher>
-
-  <!-- Buscador de Yo-kai -->
-  <div class="buscador-con-icono">
-    <img src="assets/fotos/mi-icono.png" alt="Buscar" class="icono-buscador" />
-    <ion-searchbar
-      [(ngModel)]="textoBusqueda"
-      (ionInput)="filtrarYokais()"
-      placeholder="Buscar por nombre"
-      debounce="300">
-    </ion-searchbar>
-  </div>
-
-  <!-- Filtros -->
-  <div class="filtros-container">
-    <ion-item>
-      <ion-label>Rango</ion-label>
-      <ion-select [(ngModel)]="filtroRango" (ionChange)="filtrarYokais()">
-        <ion-select-option value="">Todos</ion-select-option>
-        <ion-select-option value="S">S</ion-select-option>
-        <ion-select-option value="A">A</ion-select-option>
-        <ion-select-option value="B">B</ion-select-option>
-        <ion-select-option value="C">C</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Tipo</ion-label>
-      <ion-select [(ngModel)]="filtroTribu" (ionChange)="filtrarYokais()">
-        <ion-select-option value="">Todos</ion-select-option>
-        <ion-select-option value="Místico">Místico</ion-select-option>
-        <ion-select-option value="Luchador">Luchador</ion-select-option>
-        <ion-select-option value="Sombrío">Sombrío</ion-select-option>
-        <ion-select-option value="Sabio">Sabio</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </div>
-
-  <!-- Lista de Yo-kai -->
-  <ion-list>
-    <ng-container *ngFor="let yokai of yokais">
-      <div *ngIf="yokai.visible" class="yokai-container">
-        <ion-item (click)="toggleYokai(yokai)">
-          <ion-thumbnail slot="start">
-            <ion-img [src]="yokai.imagenUrl"></ion-img>
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ yokai.nombre }}</h2>
-            <p>{{ yokai.tribu }} - Nº: {{ yokai.numeroYokai }} | Rango: {{ yokai.rango }}</p>
-          </ion-label>
-        </ion-item>
-
-        <!-- Detalles adicionales -->
-        <div *ngIf="yokai.mostrar" class="contenido-yokai">
-          <!-- Biografía -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Biografía:</h3>
-              <p>{{ yokai.biografia || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Habilidades -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Habilidades:</h3>
-              <p>{{ yokai.habilidades || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Ataque -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Ataque:</h3>
-              <p>{{ yokai.ataque || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Animáximum -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Animáximum:</h3>
-              <p>{{ yokai.animaximum || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Espiritación -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Espiritación:</h3>
-              <p>{{ yokai.espiritacion || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Evoluciones -->
-          <div *ngIf="yokai.evoluciones && yokai.evoluciones.length > 0">
-            <ion-card class="detalle-card">
-              <ion-card-content>
-                <h3>Evoluciones:</h3>
-                <p>{{ yokai.evoluciones || 'No disponible' }}</p>
-              </ion-card-content>
-            </ion-card>
-          </div>
-
-          <!-- Fusiones -->
-          <div *ngIf="yokai.fusiones && yokai.fusiones.length > 0">
-            <ion-card class="detalle-card">
-              <ion-card-content>
-                <h3>Fusiones:</h3>
-                <p>{{ yokai.fusiones || 'No disponible' }}</p>
-              </ion-card-content>
-            </ion-card>
-          </div>
-
-          <!-- Alimento Favorito -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Alimento Favorito:</h3>
-              <p>{{ yokai.alimentoFavorito || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Localización -->
-          <ion-card class="detalle-card">
-            <ion-card-content>
-              <h3>Localización:</h3>
-              <p>{{ yokai.localizacion || 'No disponible' }}</p>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Foto medalla -->
-          <ion-card class="detalle-card" *ngIf="yokai.imagenAdicional">
-            <ion-card-content>
-              <h3>Foto Medalla:</h3>
-              <ion-img [src]="yokai.imagenMedalla" alt="Imagen medalla"></ion-img>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Foto adicional -->
-          <ion-card class="detalle-card" *ngIf="yokai.imagenAdicional">
-            <ion-card-content>
-              <h3>Foto Adicional:</h3>
-              <ion-img [src]="yokai.imagenAdicional" alt="Imagen adicional"></ion-img>
-            </ion-card-content>
-          </ion-card>
-        
-        </div>
-      </div>
+<ion-content class="tab2-content" fullscreen>
+  <div class="ion-padding">
+    <ng-container *ngIf="criteria; else noCriteria">
+      <ion-item lines="none" class="reservation-summary">
+        <ion-label>
+          <h3>Reserva</h3>
+          <p class="reservation-dates">
+            {{ criteria?.checkin | date:'shortDate' }} ➜ {{ criteria?.checkout | date:'shortDate' }}
+          </p>
+          <p class="reservation-meta">
+            {{ criteria?.adults }} Adultos • {{ criteria?.children }} Niños • {{ criteria?.rooms }} Habitaciones • {{ criteria?.pets ? 'Si mascotas' : 'No mascotas' }}
+          </p>
+        </ion-label>
+        <ion-button fill="clear" slot="end" (click)="edit()">Editar</ion-button>
+      </ion-item>
     </ng-container>
-  </ion-list>
+
+    <ng-template #noCriteria>
+      <div class="no-criteria">Selecciona fechas y criterios para mostrar habitaciones.</div>
+    </ng-template>
+
+    <div class="filters-container">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="12">
+            <ion-segment [(ngModel)]="favoritesFilter" (ionChange)="onFilterChange()" value="all">
+              <ion-segment-button value="all">
+                <ion-label>Todos</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="favorites">
+                <ion-label style="margin-left:6px">Favoritos</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </ion-col>
+
+          <ion-col size="12" size-md="4">
+            <ion-item class="compact">
+              <ion-icon name="bed-outline" slot="start"></ion-icon>
+              <ion-label>Tipo habitación</ion-label>
+              <ion-select [(ngModel)]="selectedRoomType" (ionChange)="onFilterChange()" placeholder="Cualquiera">
+                <ion-select-option *ngFor="let t of roomTypes" [value]="t">{{ t }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="4">
+            <ion-item class="compact">
+              <ion-icon name="layers-outline" slot="start"></ion-icon>
+              <ion-label>Planta</ion-label>
+              <ion-select [(ngModel)]="selectedFloor" (ionChange)="onFilterChange()" placeholder="Cualquiera">
+                <ion-select-option *ngFor="let f of floors" [value]="f">{{ f }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="4">
+            <ion-item class="compact">
+              <ion-icon name="apps-outline" slot="start"></ion-icon>
+              <ion-label>Extras</ion-label>
+              <ion-select multiple [(ngModel)]="selectedAmenities" (ionChange)="onFilterChange()" placeholder="Seleccionar">
+                <ion-select-option *ngFor="let a of amenitiesOptions" [value]="a">{{ a }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-button fill="clear" (click)="resetFilters()">Limpiar filtros</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <div class="results-header">
+      <div class="count">{{ filteredRooms?.length || 0 }} habitaciones</div>
+    </div>
+
+    <div class="rooms-list">
+      <ng-container *ngIf="filteredRooms?.length; else noRooms">
+        <div *ngFor="let r of filteredRooms" class="room-card" (click)="openRoomDetails(r)">
+          <div class="room-image">
+            <img [src]="r.photos && r.photos.length ? r.photos[0] : 'assets/fotosInicio/1.webp'" alt="{{ r.name || 'Habitación' }}"/>
+          </div>
+          <div class="room-content">
+            <div class="room-header">
+              <div class="title">{{ r.name || 'Habitación de ejemplo' }}</div>
+              <div class="favorite" (click)="toggleFavorite(r, $event)">
+                <ion-icon [name]="r.favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              </div>
+            </div>
+
+            <div class="meta">
+              <div class="stars">
+                <ng-container *ngFor="let _ of starsArray(r.rating); let i = index">
+                  <ion-icon name="star" style="color:#f5b50a"></ion-icon>
+                </ng-container>
+                <ng-container *ngFor="let _ of starsArray(5 - (r.rating || 0))">
+                  <ion-icon name="star-outline" style="color:#f5b50a"></ion-icon>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="badges">
+              <ng-container *ngIf="r.amenities && r.amenities.length">
+                <span *ngFor="let a of r.amenities" class="badge">{{ a }}</span>
+              </ng-container>
+            </div>
+
+            <div class="price-row">
+              <div class="price-left">
+                <div class="old-price">{{ r.oldPrice }} €</div>
+                <div class="price">{{ r.price }} €</div>
+                <div class="tax">Incluye tasas e impuestos</div>
+              </div>
+            </div>
+
+            <div class="footer-note">Precio sin Prime {{ r.oldPrice || r.price }} €</div>
+            <div class="room-actions">
+              <ion-button expand="block" color="primary" (click)="selectRoom(r, $event)">Seleccionar</ion-button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <ng-template #noRooms>
+      <div class="no-rooms">No hay habitaciones que coincidan.</div>
+    </ng-template>
+
+    
+  </div>
+  <div class="bottom-spacer" aria-hidden="true"></div>
+  <div class="bottom-left-button">
+    <ion-button fill="outline" (click)="goToTab1($event)">Anterior</ion-button>
+  </div>
 </ion-content>
+

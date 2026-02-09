@@ -1,0 +1,25 @@
+/* Styles for tab3 */
+:host {
+  --ion-background-color: transparent;
+}
+
+/* Fixed bottom-left navigation button */
+.bottom-left-button {
+  position: fixed;
+  left: 12px;
+  /* lower the button significantly so it overlaps the tab bar more */
+  bottom: calc(env(safe-area-inset-bottom) - 40px);
+  z-index: 14000;
+  transform: translateY(7px);
+}
+.bottom-left-button ion-button {
+  min-width: 96px;
+  border-radius: 24px;
+  --background: #ffffff;
+  color: #2e7d32;
+  --border-color: #2e7d32;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* small padding to avoid overlap with content */
+.ion-padding { padding-bottom: 72px; }

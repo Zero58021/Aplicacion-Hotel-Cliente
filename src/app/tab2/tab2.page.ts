@@ -1,111 +1,378 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { IonRefresher } from '@ionic/angular';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { PhotoModalComponent } from '../photo-modal/photo-modal.component';
+import { RoomDetailComponent } from '../room-detail/room-detail.component';
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SearchService, SearchCriteria } from '../services/search.service';
+import { SelectionService } from '../services/selection.service';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss'],
-  standalone: false
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+  templateUrl: './tab2.page.html',
+  styleUrls: ['./tab2.page.scss'],
 })
-export class Tab2Page implements OnInit {
+export class Tab2Page implements OnInit, OnDestroy {
+  criteria: SearchCriteria | null = null;
+  private sub?: Subscription;
+  // Opciones de filtro
+  roomTypes = ['Individual', 'Doble', 'Doble individual', 'Triple', 'Suite', 'Familiar'];
+  floors = ['Baja', 'Primera', 'Segunda', 'Tercera', 'Cuarta'];
+  amenitiesOptions = ['Balcón', 'Bañera', 'Cuna', 'Ducha', 'Frigorífico', 'Sin nada', 'Televisión', 'Terraza', 'WiFi'];
 
-  textoBusqueda: string = '';
-  filtroRango: string = '';
-  filtroTribu: string = '';
+  // Selecciones actuales
+  selectedRoomType: string | null = null;
+  selectedFloor: string | null = null;
+  selectedAmenities: string[] = [];
+  // filtro de favoritos: 'all' | 'favorites'
+  favoritesFilter: 'all' | 'favorites' = 'all';
 
-  yokais = [
-    {
-      id: 1,
-      nombre: 'Whisper',
-      rango: 'B',
-      tribu: 'Místico',
-      habilidades: ['Aviso', 'Consejo'],
-      imagenUrl: 'assets/yokais/whisper.svg',
-      mostrar: false,
-      visible: true
-    },
-    {
-      id: 2,
-      nombre: 'Jibanyan',
-      numeroYokai: '093',
-      rango: 'A',
-      tribu: 'Luchador',
-      biografia: 'Un gato fantasma que adora comer barras de chocolate y luchar contra coches.',
-      habilidades: ['Adrenalina'],
-      ataque: ['Garras Afiladas'],
-      animaximum: 'Patitas Furiosas',
-      espiritacion: 'No tan Rápido: Reduce la VEL de un rival usando un sello paralizante.',
-      evoluciones: ['Robonyan', 
-        ' Jibanyan S'],
-      fusiones: ['Jibanyan + Komasan = Komajiro'],
-      alimentoFavorito: 'Barras de Chocolate',
-      localizacion: 'Cerca de los coches',
-      imagenAdicional: 'assets/fotos/jibanyan-additional.jpg',
-      imagenMedalla: 'assets/medallas/jibanyan-medalla.png',
-      imagenUrl: 'assets/fotos/descarga.png',
-      mostrar: false,
-      visible: true
-    },
-    {
-      id: 3,
-      nombre: 'Komasan',
-      rango: 'B',
-      tribu: 'Místico',
-      habilidades: ['Espíritu Guardián', 'Lanza Mística'],
-      imagenUrl: 'assets/yokais/komasan.svg',
-      mostrar: false,
-      visible: true
-    }
+  // Lista de habitaciones de ejemplo (puedes sustituir por datos reales/servicio)
+  // Fuente de datos de habitaciones (vacía por defecto — conecta con tu servicio/API)
+  rooms: any[] = [
+    { id: 1, name: 'Individual Económica', type: 'Individual', floor: 'Baja', amenities: ['WiFi'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/2.jpg'], favorite: false, price: 47, oldPrice: 79, rating: 3, location: 'Centro histórico', distance: '0.8 km' },
+    { id: 2, name: 'Doble Con Balcón', type: 'Doble', floor: 'Primera', amenities: ['Balcón','Televisión'], photos: ['assets/fotosInicio/2.jpg','assets/fotosInicio/3.jpg'], favorite: false, price: 69, oldPrice: 99, rating: 4, location: 'Zona comercial', distance: '1.2 km' },
+    { id: 3, name: 'Suite Familiar', type: 'Suite', floor: 'Segunda', amenities: ['Terraza','Frigorífico','Televisión'], photos: ['assets/fotosInicio/3.jpg','assets/fotosInicio/4.jpg'], favorite: false, price: 129, oldPrice: 159, rating: 5, location: 'Vistas al río', distance: '0.4 km' },
+    { id: 4, name: 'Triple Estándar', type: 'Triple', floor: 'Tercera', amenities: ['Ducha','Cuna','WiFi'], photos: ['assets/fotosInicio/4.jpg','assets/fotosInicio/5.jpg'], favorite: false, price: 89, oldPrice: 119, rating: 4, location: 'Cerca estación', distance: '2.0 km' },
+    { id: 5, name: 'Doble Individual Superior', type: 'Doble individual', floor: 'Cuarta', amenities: ['Bañera','Televisión'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/1.webp'], favorite: false, price: 79, oldPrice: 109, rating: 4, location: 'Barrio tranquilo', distance: '3.5 km' },
+    { id: 6, name: 'Familiar Plus', type: 'Familiar', floor: 'Primera', amenities: ['Terraza','Balcón','Frigorífico'], photos: ['assets/fotosInicio/1.webp','assets/fotosInicio/3.jpg'], favorite: false, price: 139, oldPrice: 179, rating: 5, location: 'Suburbio', distance: '5.1 km' },
+    { id: 7, name: 'Individual Con Terraza', type: 'Individual', floor: 'Segunda', amenities: ['Terraza','WiFi'], photos: ['assets/fotosInicio/2.jpg'], favorite: false, price: 59, oldPrice: 79, rating: 3, location: 'Centro histórico', distance: '0.9 km' },
+    { id: 8, name: 'Suite Junior', type: 'Suite', floor: 'Tercera', amenities: ['Balcón','Televisión','Frigorífico'], photos: ['assets/fotosInicio/3.jpg'], favorite: false, price: 119, oldPrice: 149, rating: 5, location: 'Vistas al río', distance: '0.6 km' },
+    { id: 9, name: 'Doble Económica', type: 'Doble', floor: 'Baja', amenities: ['Ducha','WiFi'], photos: ['assets/fotosInicio/4.jpg'], favorite: false, price: 49, oldPrice: 69, rating: 3, location: 'Zona comercial', distance: '1.8 km' },
+    { id: 10, name: 'Familiar Estándar', type: 'Familiar', floor: 'Cuarta', amenities: ['Cuna','Frigorífico'], photos: ['assets/fotosInicio/5.jpg','assets/fotosInicio/2.jpg'], favorite: false, price: 99, oldPrice: 129, rating: 4, location: 'Barrio tranquilo', distance: '4.0 km' }
   ];
 
-  constructor(private route: ActivatedRoute) {}
+  filteredRooms = this.rooms.slice();
+  @ViewChildren('albumContainer') albumContainers!: QueryList<ElementRef<HTMLDivElement>>;
+
+  // per-container state maps (copied from Tab1 for identical album behaviour)
+  private intervalMap = new Map<HTMLElement, any>();
+  private currentIndexMap = new Map<HTMLElement, number>();
+  private totalSlidesMap = new Map<HTMLElement, number>();
+  private isPausedMap = new Map<HTMLElement, boolean>();
+  private rafMap = new Map<HTMLElement, number>();
+  private listenersMap = new Map<HTMLElement, { down: any; up: any; enter: any; leave: any }>();
+
+  constructor(private searchService: SearchService, private router: Router, private modalCtrl: ModalController, private selectionService: SelectionService) { }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const id = +params['id'];
-      if (id) {
-        const yokaiSeleccionado = this.yokais.find(y => y.id === id);
-        if (yokaiSeleccionado) {
-          this.yokais.forEach(y => y.mostrar = false);
-          yokaiSeleccionado.mostrar = true;
+    this.sub = this.searchService.criteria$.subscribe(c => {
+      this.criteria = c;
+      // si ya hay filtros en criterios, sincronizarlos
+      if (c) {
+        this.selectedRoomType = c.roomType ?? null;
+        this.selectedFloor = c.floor ?? null;
+        this.selectedAmenities = c.amenities ? c.amenities.slice() : [];
+      }
+      this.applyFilters();
+    });
+    // cargar favoritos guardados
+    this.loadFavorites();
+  }
+
+  starsArray(n: number) {
+    const count = Math.max(0, Math.round(n || 0));
+    return Array.from({ length: count });
+  }
+
+  private loadFavorites() {
+    try {
+      const raw = localStorage.getItem('roomFavorites');
+      if (!raw) return;
+      const ids: number[] = JSON.parse(raw);
+      this.rooms.forEach(r => r.favorite = ids.includes(r.id));
+    } catch (e) {
+      console.warn('No se pudieron cargar los favoritos', e);
+    }
+  }
+
+  private saveFavorites() {
+    try {
+      const ids = this.rooms.filter(r => r.favorite).map(r => r.id);
+      localStorage.setItem('roomFavorites', JSON.stringify(ids));
+    } catch (e) {
+      console.warn('No se pudieron guardar los favoritos', e);
+    }
+  }
+
+  async openPhoto(src: string) {
+    const modal = await this.modalCtrl.create({
+      component: PhotoModalComponent,
+      componentProps: { src },
+      cssClass: 'photo-modal'
+    });
+    await modal.present();
+  }
+
+  async openRoomDetails(room: any) {
+    const modal = await this.modalCtrl.create({
+      component: RoomDetailComponent,
+      componentProps: { room },
+      cssClass: 'room-detail-modal',
+      breakpoints: [0.25, 0.6, 0.95],
+      initialBreakpoint: 0.6
+    });
+    await modal.present();
+  }
+
+  ngAfterViewInit(): void {
+    // Wait a tick so the QueryList is populated and layout is stable
+    setTimeout(() => {
+      this.albumContainers.forEach((ref) => {
+        const container = ref.nativeElement as HTMLElement;
+        if (!container) return;
+
+        const items = Array.from(container.querySelectorAll('.album-item')) as HTMLElement[];
+        const total = items.length || 0;
+        this.totalSlidesMap.set(container, total);
+        this.currentIndexMap.set(container, 0);
+        this.isPausedMap.set(container, false);
+
+        // set initial active slide
+        this.setActiveFor(container, 0);
+
+        // attach interaction listeners to pause/resume when user interacts
+        const down = () => this.stopAutoScroll(container);
+        const up = () => this.startAutoScroll(container);
+        const enter = () => this.stopAutoScroll(container);
+        const leave = () => this.startAutoScroll(container);
+
+        container.addEventListener('pointerdown', down, { passive: true });
+        container.addEventListener('pointerup', up, { passive: true });
+        container.addEventListener('pointerenter', enter, { passive: true });
+        container.addEventListener('pointerleave', leave, { passive: true });
+
+        this.listenersMap.set(container, { down, up, enter, leave });
+
+        // start automatic sliding for this container
+        this.startAutoScroll(container);
+      });
+    }, 300);
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+    // remove listeners and clear intervals for all album containers
+    this.listenersMap.forEach((listeners, container) => {
+      container.removeEventListener('pointerdown', listeners.down);
+      container.removeEventListener('pointerup', listeners.up);
+      container.removeEventListener('pointerenter', listeners.enter);
+      container.removeEventListener('pointerleave', listeners.leave);
+    });
+    this.intervalMap.forEach((id) => clearInterval(id));
+    this.intervalMap.clear();
+    this.listenersMap.clear();
+    this.currentIndexMap.clear();
+    this.totalSlidesMap.clear();
+    this.isPausedMap.clear();
+  }
+
+  edit() {
+    this.router.navigateByUrl('/tabs/tab1');
+  }
+
+  applyFilters() {
+    this.filteredRooms = this.rooms.filter(r => {
+      if (this.selectedRoomType && this.selectedRoomType !== r.type) return false;
+      if (this.selectedFloor && this.selectedFloor !== r.floor) return false;
+      if (this.selectedAmenities && this.selectedAmenities.length) {
+        // If 'Sin nada' selected, treat as rooms that only have 'Sin nada' or no amenities
+        if (this.selectedAmenities.includes('Sin nada')) {
+          if (!(r.amenities.length === 0 || (r.amenities.length === 1 && r.amenities[0] === 'Sin nada'))) return false;
+        } else {
+          // all selected amenities must be present in room
+          for (const a of this.selectedAmenities) {
+            if (!r.amenities.includes(a)) return false;
+          }
         }
       }
+      // favorites filter
+      if (this.favoritesFilter === 'favorites' && !r.favorite) return false;
+      return true;
     });
   }
 
-  // Función para alternar la visibilidad de cada Yo-kai
-  toggleYokai(yokai: any) {
-    this.yokais.forEach(y => { if (y !== yokai) y.mostrar = false; });
-    yokai.mostrar = !yokai.mostrar;
+  toggleFavorite(room: any, ev?: Event) {
+    if (ev) ev.stopPropagation();
+    room.favorite = !room.favorite;
+    this.saveFavorites();
   }
 
-  // Función para filtrar Yo-kai por nombre, rango y tipo
-  filtrarYokais() {
-    const texto = this.textoBusqueda.toLowerCase();
-
-    this.yokais.forEach(yokai => {
-      const nombreCoincide = yokai.nombre.toLowerCase().includes(texto);
-      const rangoCoincide = this.filtroRango ? yokai.rango === this.filtroRango : true;
-      const tipoCoincide = this.filtroTribu ? yokai.tribu === this.filtroTribu : true;
-
-      yokai.visible = nombreCoincide && rangoCoincide && tipoCoincide;
+  onFilterChange() {
+    this.applyFilters();
+    const base: SearchCriteria = this.searchService.current ?? {
+      checkin: null,
+      checkout: null,
+      adults: 2,
+      children: 0,
+      rooms: 1,
+      pets: false
+    };
+    this.searchService.setCriteria({
+      ...base,
+      roomType: this.selectedRoomType ?? undefined,
+      floor: this.selectedFloor ?? undefined,
+      amenities: this.selectedAmenities && this.selectedAmenities.length ? this.selectedAmenities.slice() : undefined
     });
   }
 
-  // Función que se llama al hacer "pull-to-refresh"
-  doRefresh(event: any) {
-    console.log('Buscando Yo-kais...');
-
-    // Simulamos la actualización de los datos
-    setTimeout(() => {
-      // Aquí puedes realizar una llamada a tu servicio o recargar datos
-      // Simulando recarga de datos
-      this.yokais = [...this.yokais]; // Fuerza la actualización de la lista de yokais
-
-      // Finaliza el refresco
-      event.target.complete();
-      console.log('Yo-kais encontrados!');
-    }, 2000); // Simula un retraso de 2 segundos
+  resetFilters() {
+    this.selectedRoomType = null;
+    this.selectedFloor = null;
+    this.selectedAmenities = [];
+    this.onFilterChange();
   }
+
+  selectRoom(room: any, ev?: Event) {
+    if (ev) ev.stopPropagation();
+    this.selectionService.setSelectedRoom(room);
+    this.router.navigateByUrl('/tabs/tab3');
+  }
+
+  goToTab1(ev?: Event) {
+    if (ev) ev.stopPropagation();
+    this.router.navigateByUrl('/tabs/tab1');
+  }
+
+  public nextSlideFromEvent(ev: Event, skipAnimation = false) {
+    const container = this.findContainerFromEvent(ev);
+    if (!container) return;
+    this.nextSlide(container, skipAnimation);
+  }
+
+  public prevSlideFromEvent(ev: Event, skipAnimation = false) {
+    const container = this.findContainerFromEvent(ev);
+    if (!container) return;
+    this.prevSlide(container, skipAnimation);
+  }
+
+  public nextSlide(containerParam?: ElementRef<HTMLDivElement> | HTMLElement, skipAnimation = false) {
+    const container = this.normalizeContainer(containerParam);
+    if (!container) return;
+
+    const total = this.totalSlidesMap.get(container) || 0;
+    if (total === 0) return;
+
+    const slideWidth = container.clientWidth;
+    const current = this.currentIndexMap.get(container) || 0;
+    const nextIndex = (current + 1) % total;
+    const left = nextIndex * slideWidth;
+
+    if (skipAnimation || nextIndex === 0) {
+      const prevRaf = this.rafMap.get(container);
+      if (prevRaf) { cancelAnimationFrame(prevRaf); this.rafMap.delete(container); }
+      this.setActiveFor(container, nextIndex);
+      container.scrollLeft = left;
+      this.currentIndexMap.set(container, nextIndex);
+      return;
+    }
+
+    this.setActiveFor(container, nextIndex);
+    this.currentIndexMap.set(container, nextIndex);
+    this.animateScrollTo(container, left, 3600);
+  }
+
+  public prevSlide(containerParam?: ElementRef<HTMLDivElement> | HTMLElement, skipAnimation = false) {
+    const container = this.normalizeContainer(containerParam);
+    if (!container) return;
+
+    const total = this.totalSlidesMap.get(container) || 0;
+    if (total === 0) return;
+
+    const slideWidth = container.clientWidth;
+    const current = this.currentIndexMap.get(container) || 0;
+    const prevIndex = (current - 1 + total) % total;
+    const left = prevIndex * slideWidth;
+
+    if (skipAnimation || (prevIndex === total - 1 && current === 0)) {
+      const prevRaf = this.rafMap.get(container);
+      if (prevRaf) { cancelAnimationFrame(prevRaf); this.rafMap.delete(container); }
+      this.setActiveFor(container, prevIndex);
+      container.scrollLeft = left;
+      this.currentIndexMap.set(container, prevIndex);
+      return;
+    }
+
+    this.setActiveFor(container, prevIndex);
+    this.currentIndexMap.set(container, prevIndex);
+    this.animateScrollTo(container, left, 3600);
+  }
+
+  private animateScrollTo(container: HTMLElement, targetLeft: number, duration = 900) {
+    const prev = this.rafMap.get(container);
+    if (prev) { cancelAnimationFrame(prev); this.rafMap.delete(container); }
+
+    const startLeft = container.scrollLeft;
+    const change = targetLeft - startLeft;
+    const startTime = performance.now();
+
+    const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const val = easeInOutQuad(t);
+      container.scrollLeft = Math.round(startLeft + change * val);
+      if (t < 1) {
+        const id = requestAnimationFrame(step);
+        this.rafMap.set(container, id);
+      } else {
+        const id = this.rafMap.get(container);
+        if (id) this.rafMap.delete(container);
+      }
+    };
+
+    const id = requestAnimationFrame(step);
+    this.rafMap.set(container, id);
+  }
+
+  private startAutoScroll(containerParam?: ElementRef<HTMLDivElement> | HTMLElement) {
+    const container = this.normalizeContainer(containerParam);
+    if (!container) return;
+
+    const total = this.totalSlidesMap.get(container) || 0;
+    if (total <= 1) return;
+    if (this.intervalMap.has(container)) return;
+
+    this.isPausedMap.set(container, false);
+    const id = setInterval(() => {
+      if (!this.isPausedMap.get(container)) this.nextSlide(container);
+    }, 4000);
+    this.intervalMap.set(container, id);
+  }
+
+  private stopAutoScroll(containerParam?: ElementRef<HTMLDivElement> | HTMLElement) {
+    const container = this.normalizeContainer(containerParam);
+    if (!container) return;
+
+    this.isPausedMap.set(container, true);
+    const id = this.intervalMap.get(container);
+    if (id) { clearInterval(id); this.intervalMap.delete(container); }
+  }
+
+  private findContainerFromEvent(ev: Event): HTMLElement | null {
+    const btn = ev.currentTarget as HTMLElement | null;
+    if (!btn) return null;
+    const wrapper = btn.closest('.album-wrapper') as HTMLElement | null;
+    if (!wrapper) return null;
+    return wrapper.querySelector('.album-container') as HTMLElement | null;
+  }
+
+  private setActiveFor(container: HTMLElement, index: number) {
+    if (!container) return;
+    const items = Array.from(container.querySelectorAll('.album-item')) as HTMLElement[];
+    items.forEach((it, i) => { if (i === index) it.classList.add('active'); else it.classList.remove('active'); });
+  }
+
+  private normalizeContainer(containerParam?: ElementRef<HTMLDivElement> | HTMLElement): HTMLElement | null {
+    if (!containerParam) return null;
+    if ((containerParam as ElementRef).nativeElement) return (containerParam as ElementRef).nativeElement as HTMLElement;
+    return containerParam as HTMLElement;
+  }
+
 }

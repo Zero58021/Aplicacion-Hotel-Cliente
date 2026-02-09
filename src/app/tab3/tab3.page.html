@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Reserva - Habitación seleccionada</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Habitación seleccionada</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+    <ng-container *ngIf="selectedRoom; else noSelection">
+      <ion-card>
+        <img [src]="selectedRoom.photos && selectedRoom.photos.length ? selectedRoom.photos[0] : 'assets/fotosInicio/1.webp'" alt="Foto">
+        <ion-card-header>
+          <ion-card-title>{{ selectedRoom.name }}</ion-card-title>
+          <ion-card-subtitle>{{ selectedRoom.type }} · {{ selectedRoom.floor }} · {{ selectedRoom.location }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div>
+            <strong>Valoración:</strong>
+            <ng-container *ngFor="let _ of (selectedRoom.rating ? [].constructor(selectedRoom.rating) : [])">
+              ★
+            </ng-container>
+            <ng-container *ngIf="!selectedRoom.rating">Sin valoración</ng-container>
+          </div>
+          <div style="margin-top:8px"><strong>Precio:</strong> {{ selectedRoom.price }} € (antes {{ selectedRoom.oldPrice }} €)</div>
+          <div style="margin-top:8px"><strong>Ubicación:</strong> {{ selectedRoom.location }} · {{ selectedRoom.distance }}</div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+    <ng-template #noSelection>
+      <div>No hay ninguna habitación seleccionada. Ve a la pestaña de habitaciones y pulsa "Seleccionar".</div>
+    </ng-template>
+  </div>
+  <div class="bottom-left-button">
+    <ion-button fill="outline" (click)="goToTab2($event)">Anterior</ion-button>
+  </div>
+
+</ion-content>

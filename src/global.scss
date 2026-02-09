@@ -55,3 +55,36 @@ ion-content, .ion-page {
 a, button, ion-button {
 	color: var(--ion-color-primary) !important;
 }
+
+/* Estilos para modal de detalle de habitación: limitar ancho y centrar */
+.room-detail-modal .modal-wrapper {
+	max-width: 560px;
+	width: calc(100% - 40px) !important; /* deja 20px a cada lado */
+	margin: 0 20px !important;
+	height: auto !important;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+/* En pantallas grandes dejar más espacio lateral y centrar */
+@media (min-width: 900px) {
+	.room-detail-modal .modal-wrapper {
+		max-width: 760px;
+		width: calc(100% - 240px);
+		margin: 0 auto;
+	}
+}
+
+/* Asegurar espacio lateral en móviles aunque Ionic fuerce ancho */
+@media (max-width: 899px) {
+	.room-detail-modal {
+		padding-left: 20px !important;
+		padding-right: 20px !important;
+	}
+	.room-detail-modal .modal-wrapper {
+		left: 20px !important;
+		right: 20px !important;
+		box-sizing: border-box;
+	}
+}
+
