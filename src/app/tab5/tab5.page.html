@@ -15,8 +15,9 @@
   </ion-refresher>
   <ion-content>
     <div class="reservations-container">
-      <ion-list *ngIf="reservations && reservations.length; else empty">
-        <ion-item lines="none" *ngFor="let res of reservations; let i = index" class="reservation-item">
+      <ng-container>
+        <ion-list *ngIf="activeReservations && activeReservations.length; else noActive">
+          <ion-item lines="none" *ngFor="let res of activeReservations" class="reservation-item">
           <ion-card class="reservation-card" [class.cancelled]="res.estado === 'Cancelada'">
             <ion-card-header class="card-header">
               <div class="header-left">
@@ -27,11 +28,8 @@
                 <ion-button fill="clear" color="primary" size="small" (click)="openInfo(res)" title="Info">
                   <ion-icon name="information-circle"></ion-icon>
                 </ion-button>
-                <ion-button fill="clear" color="warning" size="small" (click)="cancelReservation(i)" *ngIf="res.estado !== 'Cancelada'">
+                <ion-button fill="clear" color="warning" size="small" (click)="cancelReservation(reservations.indexOf(res))" *ngIf="res.estado !== 'Cancelada'">
                   <ion-icon name="close-circle"></ion-icon>
-                </ion-button>
-                <ion-button fill="clear" color="medium" size="small" (click)="deleteReservation(i)">
-                  <ion-icon name="trash"></ion-icon>
                 </ion-button>
               </div>
             </ion-card-header>
@@ -63,11 +61,49 @@
               </div>
             </ion-card-content>
           </ion-card>
-        </ion-item>
-      </ion-list>
-    <ng-template #empty>
-      <div class="empty">Aún no hay reservas.</div>
-    </ng-template>
+          </ion-item>
+        </ion-list>
+
+        <ng-template #noActive>
+          <!-- no active reservations -->
+        </ng-template>
+
+        <div *ngIf="cancelledReservations && cancelledReservations.length">
+          <div class="cancelled-section">
+            <h3>Reservas canceladas</h3>
+            <ion-list>
+              <ion-item lines="none" *ngFor="let res of cancelledReservations" class="reservation-item cancelled-item">
+                <ion-card class="reservation-card cancelled" >
+                  <ion-card-header class="card-header">
+                    <div class="header-left">
+                      <ion-card-title class="name">{{ res.nombreCliente }}</ion-card-title>
+                      <ion-card-subtitle class="meta">{{ res.id }} · {{ res.estado }}</ion-card-subtitle>
+                    </div>
+                    <div class="header-right">
+                      <ion-button fill="clear" color="primary" size="small" (click)="openInfo(res)" title="Info">
+                        <ion-icon name="information-circle"></ion-icon>
+                      </ion-button>
+                      <ion-button fill="clear" color="success" size="small" (click)="reactivateReservation(res.id)" title="Aceptar">
+                        <ion-icon name="checkmark-done"></ion-icon>
+                      </ion-button>
+                    </div>
+                  </ion-card-header>
+                  <ion-card-content class="card-content">
+                    <div class="row small details">
+                      <div class="col"><strong>Entrada</strong> {{ res.fechaEntrada | date:'mediumDate' }}</div>
+                      <div class="col"><strong>Salida</strong> {{ res.fechaSalida | date:'mediumDate' }}</div>
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-item>
+            </ion-list>
+          </div>
+        </div>
+
+        <ng-template #empty>
+          <div class="empty">Aún no hay reservas.</div>
+        </ng-template>
+      </ng-container>
     </div>
   </ion-content>
 </ion-content>

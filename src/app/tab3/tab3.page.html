@@ -82,59 +82,67 @@
         <div *ngIf="passengers.length === 0" class="empty-note">No hay pasajeros añadidos.</div>
 
         <div *ngFor="let p of passengers; let i = index" class="passenger-form" id="passenger-{{i}}">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>{{ p.isPrimary ? 'Titular' : ('Pasajero ' + (i + 1)) }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-item>
-                <ion-label position="stacked">Nombre</ion-label>
-                <ion-input [(ngModel)]="p.name" placeholder="Nombre"></ion-input>
-              </ion-item>
+          <ng-container *ngIf="editingIndex === i">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>{{ p.isPrimary ? 'Titular' : ('Pasajero ' + (i + 1)) }}</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-item>
+                  <ion-label position="stacked">Nombre</ion-label>
+                  <ion-input [(ngModel)]="p.name" placeholder="Nombre"></ion-input>
+                  <div class="ion-text-danger" *ngIf="editingIndex===i && passengersErrors[i]?.name">Nombre inválido</div>
+                </ion-item>
 
-              <ion-item>
-                <ion-label position="stacked">Apellidos</ion-label>
-                <ion-input [(ngModel)]="p.lastName" placeholder="Apellidos"></ion-input>
-              </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Apellidos</ion-label>
+                  <ion-input [(ngModel)]="p.lastName" placeholder="Apellidos"></ion-input>
+                  <div class="ion-text-danger" *ngIf="editingIndex===i && passengersErrors[i]?.lastName">Apellidos inválidos</div>
+                </ion-item>
 
-              <ion-item>
-                <ion-label position="stacked">Tipo</ion-label>
-                <ion-segment [(ngModel)]="p.type">
-                  <ion-segment-button value="adult">Adulto</ion-segment-button>
-                  <ion-segment-button value="child">Niño</ion-segment-button>
-                </ion-segment>
-              </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Tipo</ion-label>
+                  <ion-segment [(ngModel)]="p.type">
+                    <ion-segment-button value="adult">Adulto</ion-segment-button>
+                    <ion-segment-button value="child">Niño</ion-segment-button>
+                  </ion-segment>
+                </ion-item>
 
-              <ion-item *ngIf="p.isPrimary">
-                <ion-label position="stacked">Teléfono</ion-label>
-                <ion-input type="tel" [(ngModel)]="p.phone" placeholder="Teléfono"></ion-input>
-              </ion-item>
+                <ion-item *ngIf="p.isPrimary">
+                  <ion-label position="stacked">Teléfono <span class="required">*</span></ion-label>
+                  <ion-input type="tel" [(ngModel)]="p.phone" placeholder="Teléfono"></ion-input>
+                  <div class="ion-text-danger" *ngIf="editingIndex===i && passengersErrors[i]?.phone">Teléfono inválido (9 dígitos) u obligatorio</div>
+                </ion-item>
 
-              <ion-item *ngIf="p.isPrimary">
-                <ion-label position="stacked">Correo</ion-label>
-                <ion-input type="email" [(ngModel)]="p.email" placeholder="Correo"></ion-input>
-              </ion-item>
+                <ion-item *ngIf="p.isPrimary">
+                  <ion-label position="stacked">Correo <span class="required">*</span></ion-label>
+                  <ion-input type="email" [(ngModel)]="p.email" placeholder="Correo"></ion-input>
+                  <div class="ion-text-danger" *ngIf="editingIndex===i && passengersErrors[i]?.email">Correo inválido u obligatorio</div>
+                </ion-item>
 
-              <ion-item>
-                <ion-label position="stacked">DNI</ion-label>
-                <ion-input [(ngModel)]="p.dni" placeholder="DNI"></ion-input>
-              </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">DNI</ion-label>
+                  <ion-input [(ngModel)]="p.dni" placeholder="DNI"></ion-input>
+                  <div class="ion-text-danger" *ngIf="editingIndex===i && passengersErrors[i]?.dni">DNI inválido (8 números y una letra)</div>
+                </ion-item>
 
-              <ion-item>
-                <ion-label position="stacked">Alergias</ion-label>
-                <ion-input [(ngModel)]="p.allergies" placeholder="Alergias (si tiene)"></ion-input>
-              </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Alergias</ion-label>
+                  <ion-input [(ngModel)]="p.allergies" placeholder="Alergias (si tiene)"></ion-input>
+                </ion-item>
 
-              <div class="form-actions">
-                <ion-button color="danger" fill="clear" size="small" (click)="removePassenger(i)">Eliminar</ion-button>
-              </div>
-              </ion-card-content>
-          </ion-card>
+                <div class="form-actions">
+                  <ion-button color="danger" fill="clear" size="small" (click)="removePassenger(i)">Eliminar</ion-button>
+                  <ion-button color="medium" fill="clear" size="small" (click)="closeEditing()">Cerrar</ion-button>
+                </div>
+                </ion-card-content>
+            </ion-card>
+          </ng-container>
         </div>
 
         <div class="add-buttons">
           <ion-button color="primary" (click)="addPrimary()" *ngIf="!hasPrimary()">Añadir titular</ion-button>
-          <ion-button color="secondary" (click)="addPassenger()" [disabled]="!hasPrimary()">Añadir otro pasajero</ion-button>
+          <ion-button color="secondary" (click)="addPassenger()" [disabled]="!hasPrimary() || !canAddPassenger()">Añadir otro pasajero</ion-button>
         </div>
 
         <div class="save-action">
@@ -155,7 +163,10 @@
                   <p>{{ p.type === 'adult' ? 'Adulto' : 'Niño' }} · DNI: {{ p.dni || '—' }}</p>
                 </ion-label>
                 <ion-buttons slot="end">
-                  <ion-button fill="clear" size="small" (click)="editPassenger(i)">Editar</ion-button>
+                  <ion-button class="btn-edit" color="tertiary" fill="outline" size="small" (click)="editPassenger(i)">
+                    <ion-icon slot="start" name="create-outline"></ion-icon>
+                    Editar
+                  </ion-button>
                   <ion-button color="danger" fill="clear" size="small" (click)="removePassenger(i)">Eliminar</ion-button>
                 </ion-buttons>
               </ion-item>

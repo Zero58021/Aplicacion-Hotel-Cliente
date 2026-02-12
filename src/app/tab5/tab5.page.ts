@@ -61,26 +61,48 @@ export class Tab5Page implements OnInit {
     return Number((roomTotal + pensionTotal).toFixed(2));
   }
 
+  // Reservas activas (no canceladas)
+  get activeReservations() {
+    return (this.reservations || []).filter(r => r.estado !== 'Cancelada');
+  }
+
+  // Reservas canceladas
+  get cancelledReservations() {
+    return (this.reservations || []).filter(r => r.estado === 'Cancelada');
+  }
+
   private async loadReservations() {
+    // Intentar cargar desde Capacitor Preferences, si falla, usar localStorage como fallback
     try {
       const ret = await Preferences.get({ key: 'reservations' });
       if (ret && ret.value) {
         this.reservations = JSON.parse(ret.value);
-      } else {
-        // Si no hay datos, inicializar con ejemplo vacío
-        this.reservations = [];
+        return;
       }
     } catch (e) {
-      console.error('Error cargando reservas:', e);
+      console.warn('Preferences.get falló, usando localStorage como fallback', e);
+    }
+
+    try {
+      const raw = localStorage.getItem('reservations');
+      this.reservations = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.error('Error cargando reservas desde localStorage:', e);
       this.reservations = [];
     }
   }
 
   async saveReservations() {
+    // Intentar guardar en Capacitor Preferences; si falla, guardar en localStorage
     try {
       await Preferences.set({ key: 'reservations', value: JSON.stringify(this.reservations) });
     } catch (e) {
-      console.error('Error guardando reservas:', e);
+      console.warn('Preferences.set falló, intentando localStorage', e);
+      try {
+        localStorage.setItem('reservations', JSON.stringify(this.reservations));
+      } catch (e2) {
+        console.error('Error guardando reservas en localStorage:', e2);
+      }
     }
   }
 
@@ -154,6 +176,31 @@ export class Tab5Page implements OnInit {
               await this.saveReservations();
             } catch (e) {
               console.error('Error al cancelar reserva', e);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async reactivateReservation(id: string) {
+    const idx = this.reservations.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    const res = this.reservations[idx];
+    const alert = await this.alertCtrl.create({
+      header: 'Aceptar reserva',
+      message: `¿Deseas aceptar la reserva de ${res.nombreCliente} (${res.id}) nuevamente?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Aceptar',
+          handler: async () => {
+            try {
+              this.reservations[idx].estado = 'Confirmada';
+              await this.saveReservations();
+            } catch (e) {
+              console.error('Error reactivando reserva', e);
             }
           }
         }

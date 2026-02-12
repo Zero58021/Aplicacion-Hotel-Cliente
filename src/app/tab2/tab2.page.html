@@ -109,6 +109,9 @@
                 <div class="old-price">{{ r.oldPrice }} €</div>
                 <div class="price">{{ r.price }} €</div>
                 <div class="tax">Incluye tasas e impuestos</div>
+                <div class="total-price" *ngIf="criteria">
+                  Total ({{ criteria?.rooms || 1 }} hab.): {{ ((criteria?.rooms || 1) * r.price) | number:'1.0-2' }} €
+                </div>
               </div>
             </div>
 

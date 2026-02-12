@@ -10,9 +10,10 @@
 .bottom-left-button {
   position: fixed;
   left: 12px;
-  bottom: calc(env(safe-area-inset-bottom) - 40px);
+  /* place the button above the tab bar and respect safe-area-inset */
+  bottom: calc(12px + env(safe-area-inset-bottom));
   z-index: 14000;
-  transform: translateY(7px);
+  transform: translateY(0);
 }
 .bottom-left-button ion-button {
   min-width: 96px;

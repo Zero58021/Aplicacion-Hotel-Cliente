@@ -232,13 +232,24 @@ export class Tab4Page implements OnInit, OnDestroy {
   }
 
   private async addReservationToStorage(reservation: any) {
+    // Intentar guardar usando Capacitor Preferences; si falla, usar localStorage
     try {
       const ret = await Preferences.get({ key: 'reservations' });
       const arr = ret && ret.value ? JSON.parse(ret.value) : [];
       arr.unshift(reservation);
       await Preferences.set({ key: 'reservations', value: JSON.stringify(arr) });
+      return;
     } catch (e) {
-      console.error('Error guardando reserva en storage:', e);
+      console.warn('Preferences no disponible, usando localStorage como fallback', e);
+    }
+
+    try {
+      const raw = localStorage.getItem('reservations');
+      const arr = raw ? JSON.parse(raw) : [];
+      arr.unshift(reservation);
+      localStorage.setItem('reservations', JSON.stringify(arr));
+    } catch (e) {
+      console.error('Error guardando reserva en localStorage:', e);
     }
   }
 

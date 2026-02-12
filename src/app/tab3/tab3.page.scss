@@ -3,14 +3,13 @@
   --ion-background-color: transparent;
 }
 
-/* Fixed bottom-left navigation button */
 .bottom-left-button {
   position: fixed;
   left: 12px;
-  /* lower the button significantly so it overlaps the tab bar more */
-  bottom: calc(env(safe-area-inset-bottom) - 40px);
+  /* place the button above the tab bar and respect safe-area-inset */
+  bottom: calc(12px + env(safe-area-inset-bottom));
   z-index: 14000;
-  transform: translateY(7px);
+  transform: translateY(0);
 }
 .bottom-left-button ion-button {
   min-width: 96px;
@@ -90,13 +89,30 @@
 .form-actions { margin-top: 8px; text-align: right }
 .empty-note { color: #666; font-size: 13px }
 
+/* Distinct styling for passenger edit button to differ from add buttons */
+.btn-edit {
+  --border-radius: 18px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ion-color-primary-contrast, #2e7d32);
+  border: 1px solid rgba(46,125,50,0.12);
+}
+.btn-edit ion-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
 /* Fixed bottom-right proceed button */
 .bottom-right-button {
   position: fixed;
   right: 12px;
-  bottom: calc(env(safe-area-inset-bottom) - 40px);
+  /* place the button above the tab bar and respect safe-area-inset */
+  bottom: calc(12px + env(safe-area-inset-bottom));
   z-index: 14000;
-  transform: translateY(7px);
+  transform: translateY(0);
   opacity: 0;
   pointer-events: none;
   transition: opacity .22s ease, transform .22s ease;
