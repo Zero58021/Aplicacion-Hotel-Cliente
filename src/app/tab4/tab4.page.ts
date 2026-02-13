@@ -1,19 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
+import { IonicModule, AlertController, ModalController } from '@ionic/angular';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Preferences } from '@capacitor/preferences';
 import { SelectionService } from '../services/selection.service';
 import { SearchService, SearchCriteria } from '../services/search.service';
 import { Router } from '@angular/router';
-import { AlertController, ModalController } from '@ionic/angular';
 import { ReservationInfoComponent } from './reservation-info.component';
+// IMPORTANTE: Importamos el servicio de conexión
+import { ApiService } from '../services/api';
 
 @Component({
   selector: 'app-tab4',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, ReservationInfoComponent, DecimalPipe],
   templateUrl: './tab4.page.html',
   styleUrls: ['./tab4.page.scss'],
 })
@@ -35,7 +35,15 @@ export class Tab4Page implements OnInit, OnDestroy {
   paymentMethod: 'online' | 'inperson' = 'online';
   paymentSuccess = false;
 
-  constructor(private selectionService: SelectionService, private searchService: SearchService, private router: Router, private alertCtrl: AlertController, private modalCtrl: ModalController) { }
+  // Inyectamos ApiService en el constructor
+  constructor(
+    private selectionService: SelectionService, 
+    private searchService: SearchService, 
+    private router: Router, 
+    private alertCtrl: AlertController, 
+    private modalCtrl: ModalController,
+    private apiService: ApiService
+  ) { }
 
   ngOnInit() {
     this.selectionService.loadFromStorage();
@@ -76,7 +84,6 @@ export class Tab4Page implements OnInit, OnDestroy {
     this.router.navigateByUrl('/tabs/tab3');
   }
 
-  /** Número de noches calculadas a partir de `criteria.checkin` y `criteria.checkout` */
   get nights(): number {
     try {
       if (!this.criteria || !this.criteria.checkin || !this.criteria.checkout) return 0;
@@ -87,7 +94,6 @@ export class Tab4Page implements OnInit, OnDestroy {
     } catch (e) { return 0; }
   }
 
-  /** Coste de la habitación = precio por noche * noches */
   get roomCost(): number {
     if (!this.selectedRoom || !this.selectedRoom.price) return 0;
     const price = Number(this.selectedRoom.price) || 0;
@@ -95,7 +101,6 @@ export class Tab4Page implements OnInit, OnDestroy {
     return price * this.nights * rooms;
   }
 
-  /** Coste de pensión = precio (por persona/día) * adultos * noches */
   get pensionCost(): number {
     const pen = this.selectedPension;
     if (!pen || !this.criteria) return 0;
@@ -106,7 +111,6 @@ export class Tab4Page implements OnInit, OnDestroy {
     return price * persons * this.nights;
   }
 
-  /** Total aproximado */
   get totalCost(): number {
     return this.roomCost + this.pensionCost;
   }
@@ -153,7 +157,6 @@ export class Tab4Page implements OnInit, OnDestroy {
       return;
     }
 
-    // Pagar en persona
     const confirmInPerson = await this.alertCtrl.create({
       header: 'Pagar en persona',
       message: 'Ha seleccionado pagar en persona. La reserva quedará registrada y podrá abonar al llegar. ¿Desea confirmar la reserva?',
@@ -172,14 +175,15 @@ export class Tab4Page implements OnInit, OnDestroy {
 
   showSuccessAnimation() {
     this.paymentSuccess = true;
-    // Auto-hide after animation ends
     setTimeout(() => {
       (async () => {
-        // Construir objeto de reserva a partir de datos actuales
         try {
           const primary = this.passengers.find(p => p.isPrimary) || this.passengers[0] || {} as any;
           const nombre = ((primary.name || '') + ' ' + (primary.lastName || '')).trim() || 'Cliente';
+          
+          // CONSTRUIMOS EL OBJETO RESERVA
           const reservation = {
+            // Nota: JSON-Server prefiere IDs que genera él, pero si quieres enviarlo tú:
             id: 'R-' + Math.floor(Math.random() * 900000 + 100000),
             nombreCliente: nombre,
             email: primary.email || '',
@@ -194,7 +198,6 @@ export class Tab4Page implements OnInit, OnDestroy {
             roomPrice: this.selectedRoom?.price ? Number(this.selectedRoom.price) : 0,
             pensionPrice: this.selectedPension ? Number(this.selectedPension.price || 0) : 0,
             total: Number((this.totalCost || 0).toFixed(2)),
-            // Persist full objects so Tab5 can show details
             selectedRoom: this.selectedRoom ? {
               name: this.selectedRoom.name,
               type: this.selectedRoom.type,
@@ -221,36 +224,42 @@ export class Tab4Page implements OnInit, OnDestroy {
             estado: 'Confirmada',
             notas: primary.allergies || ''
           };
+
+          // LLAMADA NUEVA: ENVIAR AL SERVIDOR
           await this.addReservationToStorage(reservation);
+
         } catch (e) { console.error('Error creando reserva tras pago:', e); }
 
         this.paymentSuccess = false;
-        // Navegar a la pestaña de reservas
-        try { this.router.navigateByUrl('/tabs/tab5'); } catch(e) {}
+        
       })();
     }, 2200);
   }
 
+  // ESTA ES LA FUNCIÓN QUE CAMBIA RADICALMENTE
   private async addReservationToStorage(reservation: any) {
-    // Intentar guardar usando Capacitor Preferences; si falla, usar localStorage
-    try {
-      const ret = await Preferences.get({ key: 'reservations' });
-      const arr = ret && ret.value ? JSON.parse(ret.value) : [];
-      arr.unshift(reservation);
-      await Preferences.set({ key: 'reservations', value: JSON.stringify(arr) });
-      return;
-    } catch (e) {
-      console.warn('Preferences no disponible, usando localStorage como fallback', e);
-    }
+    console.log('Enviando reserva al servidor...', reservation);
 
-    try {
-      const raw = localStorage.getItem('reservations');
-      const arr = raw ? JSON.parse(raw) : [];
-      arr.unshift(reservation);
-      localStorage.setItem('reservations', JSON.stringify(arr));
-    } catch (e) {
-      console.error('Error guardando reserva en localStorage:', e);
-    }
+    this.apiService.crearReserva(reservation).subscribe({
+      next: async (res: any) => {
+        console.log('Reserva guardada con éxito en el servidor', res);
+        
+        // Limpiamos datos temporales del móvil
+        localStorage.removeItem('reservationPassengers');
+        localStorage.removeItem('selectedPension');
+        
+        // Navegamos al historial
+        try { this.router.navigateByUrl('/tabs/tab5'); } catch(e) {}
+      },
+      error: async (err: any) => {
+        console.error('Error conectando con el servidor', err);
+        const alert = await this.alertCtrl.create({
+          header: 'Error de Conexión',
+          message: 'No se pudo guardar la reserva en el servidor. Asegúrate de que el PC tiene json-server encendido.',
+          buttons: ['OK']
+        });
+        await alert.present();
+      }
+    });
   }
-
 }

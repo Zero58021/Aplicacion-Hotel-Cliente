@@ -5,105 +5,62 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Mis reservas</ion-title>
-    </ion-toolbar>
-  </ion-header>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content pullingIcon="arrow-dropdown" refreshingSpinner="circles"></ion-refresher-content>
+    <ion-refresher-content pullingIcon="arrow-down" refreshingSpinner="circles"></ion-refresher-content>
   </ion-refresher>
-  <ion-content>
-    <div class="reservations-container">
-      <ng-container>
-        <ion-list *ngIf="activeReservations && activeReservations.length; else noActive">
-          <ion-item lines="none" *ngFor="let res of activeReservations" class="reservation-item">
-          <ion-card class="reservation-card" [class.cancelled]="res.estado === 'Cancelada'">
-            <ion-card-header class="card-header">
-              <div class="header-left">
-                <ion-card-title class="name">{{ res.nombreCliente }}</ion-card-title>
-                <ion-card-subtitle class="meta" [ngClass]="{ 'cancelada': res.estado === 'Cancelada' }">{{ res.id }} · {{ res.estado }}</ion-card-subtitle>
-              </div>
-              <div class="header-right">
-                <ion-button fill="clear" color="primary" size="small" (click)="openInfo(res)" title="Info">
-                  <ion-icon name="information-circle"></ion-icon>
-                </ion-button>
-                <ion-button fill="clear" color="warning" size="small" (click)="cancelReservation(reservations.indexOf(res))" *ngIf="res.estado !== 'Cancelada'">
-                  <ion-icon name="close-circle"></ion-icon>
-                </ion-button>
-              </div>
-            </ion-card-header>
-            <ion-card-content class="card-content">
-              <div class="row">
-                <div class="col">
-                  <div class="label">Entrada</div>
-                  <div class="value">{{ res.fechaEntrada | date:'mediumDate' }}</div>
-                </div>
-                <div class="col">
-                  <div class="label">Salida</div>
-                  <div class="value">{{ res.fechaSalida | date:'mediumDate' }} ({{ getNights(res) }} noches)</div>
-                </div>
-              </div>
-              <div class="row small details">
-                <div class="col"><strong>Hab:</strong> {{ res.selectedRoom?.name || '-' }}</div>
-                <div class="col"><strong>Pensión:</strong> {{ res.selectedPension?.name || '-' }}</div>
-              </div>
-              <div class="row small">
-                <div class="col"><strong>Hab.</strong> {{ res.habitaciones }}</div>
-                <div class="col"><strong>Adultos</strong> {{ res.adults ?? res.pax ?? '-' }}</div>
-                <div class="col"><strong>Niños</strong> {{ res.children ?? 0 }}</div>
-                <div class="col value-right"><strong>Total</strong> {{ displayTotal(res) | currency:'EUR' }}</div>
-              </div>
-              <div class="extra">
-                <div *ngIf="res.email"><ion-icon name="mail" slot="start"></ion-icon> {{ res.email }}</div>
-                <div *ngIf="res.telefono"><ion-icon name="call" slot="start"></ion-icon> {{ res.telefono }}</div>
-                <div *ngIf="res.notas" class="notes"><ion-icon name="document" slot="start"></ion-icon> {{ res.notas }}</div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-          </ion-item>
-        </ion-list>
 
-        <ng-template #noActive>
-          <!-- no active reservations -->
-        </ng-template>
+  <div class="reservations-container">
+    
+    <ion-list *ngIf="reservations && reservations.length > 0; else noReservations">
+      
+      <ion-item lines="none" *ngFor="let res of reservations" class="reservation-item">
+        <ion-card class="reservation-card" [class.cancelled]="res.estado === 'Cancelada'">
+          
+          <ion-card-header class="card-header">
+            <div class="header-left">
+              <ion-card-title class="name">{{ res.nombreCliente }}</ion-card-title>
+              <ion-card-subtitle class="meta" [class.cancelada]="res.estado === 'Cancelada'">
+                {{ res.id }} · {{ res.estado }}
+              </ion-card-subtitle>
+            </div>
+            <div class="header-right">
+              <ion-button fill="clear" color="primary" (click)="openInfo(res)">
+                <ion-icon name="information-circle"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="warning" (click)="cancelReservation(reservations.indexOf(res))" *ngIf="res.estado !== 'Cancelada'">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-header>
 
-        <div *ngIf="cancelledReservations && cancelledReservations.length">
-          <div class="cancelled-section">
-            <h3>Reservas canceladas</h3>
-            <ion-list>
-              <ion-item lines="none" *ngFor="let res of cancelledReservations" class="reservation-item cancelled-item">
-                <ion-card class="reservation-card cancelled" >
-                  <ion-card-header class="card-header">
-                    <div class="header-left">
-                      <ion-card-title class="name">{{ res.nombreCliente }}</ion-card-title>
-                      <ion-card-subtitle class="meta">{{ res.id }} · {{ res.estado }}</ion-card-subtitle>
-                    </div>
-                    <div class="header-right">
-                      <ion-button fill="clear" color="primary" size="small" (click)="openInfo(res)" title="Info">
-                        <ion-icon name="information-circle"></ion-icon>
-                      </ion-button>
-                      <ion-button fill="clear" color="success" size="small" (click)="reactivateReservation(res.id)" title="Aceptar">
-                        <ion-icon name="checkmark-done"></ion-icon>
-                      </ion-button>
-                    </div>
-                  </ion-card-header>
-                  <ion-card-content class="card-content">
-                    <div class="row small details">
-                      <div class="col"><strong>Entrada</strong> {{ res.fechaEntrada | date:'mediumDate' }}</div>
-                      <div class="col"><strong>Salida</strong> {{ res.fechaSalida | date:'mediumDate' }}</div>
-                    </div>
-                  </ion-card-content>
-                </ion-card>
-              </ion-item>
-            </ion-list>
-          </div>
-        </div>
+          <ion-card-content class="card-content">
+            <div class="row">
+              <div class="col">
+                <div class="label">Entrada</div>
+                <div class="value">{{ res.fechaEntrada | date:'dd/MM/yyyy' }}</div>
+              </div>
+              <div class="col">
+                <div class="label">Salida</div>
+                <div class="value">{{ res.fechaSalida | date:'dd/MM/yyyy' }}</div>
+              </div>
+            </div>
+            
+            <div class="row small details">
+              <div class="col"><strong>Hab:</strong> {{ res.selectedRoom?.name || 'Estándar' }}</div>
+              <div class="col value-right"><strong>Total:</strong> {{ displayTotal(res) | currency:'EUR' }}</div>
+            </div>
+          </ion-card-content>
 
-        <ng-template #empty>
-          <div class="empty">Aún no hay reservas.</div>
-        </ng-template>
-      </ng-container>
-    </div>
-  </ion-content>
+        </ion-card>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #noReservations>
+      <div class="empty">
+        <ion-icon name="calendar-outline" style="font-size: 48px;"></ion-icon>
+        <p>No se encontraron reservas en el servidor.</p>
+      </div>
+    </ng-template>
+
+  </div>
 </ion-content>

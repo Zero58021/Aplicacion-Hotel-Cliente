@@ -16,6 +16,5 @@ import { Tab4Page } from './tab4.page';
     Tab4PageRoutingModule,
     Tab4Page
   ],
-  
 })
 export class Tab4PageModule {}

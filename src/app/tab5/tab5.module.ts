@@ -16,6 +16,5 @@ import { Tab5Page } from './tab5.page';
     Tab5PageRoutingModule,
     Tab5Page
   ],
-  
 })
 export class Tab5PageModule {}
