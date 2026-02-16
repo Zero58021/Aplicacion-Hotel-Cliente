@@ -7,6 +7,7 @@ import { PhotoModalComponent } from '../photo-modal/photo-modal.component';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { Tab1PageRoutingModule } from './tab1-routing.module';
     FormsModule,
     ExploreContainerComponentModule,
     Tab1PageRoutingModule,
+    RouterModule,
     PhotoModalComponent
   ],
   declarations: [Tab1Page]

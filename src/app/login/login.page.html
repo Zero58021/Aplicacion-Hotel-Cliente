@@ -1,0 +1,52 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="bg-shapes" aria-hidden="true">
+    <span class="shape s1"></span>
+    <span class="shape s2"></span>
+    <span class="shape s3"></span>
+  </div>
+
+  <div class="login-container">
+
+    <div class="header">
+      <div class="logo-wrap">
+        <ion-icon name="happy-outline" color="primary"></ion-icon>
+      </div>
+      <h1>Bienvenido</h1>
+      <p>Accede a tus reservas</p>
+    </div>
+
+    <ion-card class="login-card" [class.shake]="shake" [class.fade-in]="true">
+      <ion-card-content>
+
+        <ion-item lines="none" class="input-item" tabindex="0">
+          <ion-icon slot="start" name="person-outline"></ion-icon>
+          <ion-input [(ngModel)]="loginUser" placeholder="Usuario (ej: isaac)" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item" tabindex="0">
+          <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+          <ion-input [(ngModel)]="loginPass" placeholder="Contraseña" [type]="showPassword ? 'text' : 'password'"></ion-input>
+          <ion-button slot="end" fill="clear" class="eye-btn" (click)="togglePassword()" aria-label="Mostrar contraseña">
+            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <div class="error-msg" *ngIf="errorMsg">
+          {{ errorMsg }}
+        </div>
+
+        <ion-button expand="block" (click)="onLogin()" class="login-btn" shape="round" [disabled]="loading">
+          <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
+          <span *ngIf="!loading">Entrar</span>
+          <span *ngIf="loading">Entrando...</span>
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <div class="footer-links">
+      <p>¿No tienes cuenta? <a routerLink="/register">Regístrate</a></p>
+    </div>
+
+  </div>
+</ion-content>

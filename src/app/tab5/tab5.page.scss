@@ -1,110 +1,113 @@
-:host {
-	display: block;
-}
+.bg-light { --background: #f4f6f8; }
 
-/* Make ion-title match tab1 styling */
+/* Make Tab5 header match Tab1 header styles */
 :host ::ng-deep ion-title {
-	color: #1b5e20 !important;
-	font-weight: 700 !important;
-	font-size: 28px !important;
-	font-family: 'Lora', Georgia, 'Times New Roman', serif !important;
-	letter-spacing: 0.4px;
+  color: #1b5e20 !important;
+  font-weight: 700 !important;
+  font-size: 28px !important;
+  font-family: 'Lora', Georgia, 'Times New Roman', serif !important;
+  letter-spacing: 0.4px;
 }
+.top-area { position: relative; overflow: visible; }
+.header-box {
+  width: 78%;
+  max-width: 760px;
+  height: auto;
+  background: linear-gradient(180deg,#1b5e20,#66bb6a);
+  margin: 18px auto 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 30;
+}
+
 
 .reservations-container {
-	padding: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Force vertical stacking and full-width cards */
-.reservations-container {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.reservation-item {
-	display: block !important;
-	width: 100% !important;
-	padding: 0 !important;
-	margin: 0 !important;
-}
+.reservation-wrapper { margin-bottom: 12px; }
 
 .reservation-card {
-	width: 100% !important;
-	min-width: 0;
-}
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin: 0;
+  background: white;
+  border-left: 4px solid var(--ion-color-primary);
 
-.reservation-item {
-	margin-bottom: 12px;
-	--background: transparent;
-}
-
-.reservation-card {
-	border-radius: 12px;
-	overflow: hidden;
-	box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  &.cancelled {
+    border-left-color: var(--ion-color-danger);
+    opacity: 0.7;
+    .name { text-decoration: line-through; }
+  }
 }
 
 .card-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 12px 16px;
-	background: linear-gradient(90deg, var(--ion-color-primary-contrast,#f7f8fb) 0%, rgba(0,0,0,0.02) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #fdfdfd;
 }
 
-.header-left .name {
-	font-size: 16px;
-	margin: 0;
-}
-.header-left .meta {
-	font-size: 12px;
-	color: var(--ion-color-medium);
-}
+.header-left .name { font-size: 1.1rem; font-weight: 700; color: #111; }
+.header-left .meta { font-size: 0.8rem; }
+.cancel-text { color: var(--ion-color-danger); font-weight: 600; }
 
-.reservation-card .card-header .meta {
-	display: inline-block;
-	margin-left: 6px;
-}
-
-.reservation-card .card-header .meta.cancelada {
-	color: var(--ion-color-danger);
-	font-weight: 600;
-}
-
-/* Atenuado para reservas canceladas */
-.reservation-card.cancelled {
-	opacity: 0.55;
-	filter: grayscale(0.28);
-}
-
-.reservation-card.cancelled .card-header,
-.reservation-card.cancelled .card-content {
-	opacity: 0.95;
-}
-
-.card-content {
-	padding: 12px 16px 16px 16px;
-}
-
-.row {
-	display: flex;
-	gap: 12px;
-	margin-bottom: 8px;
-}
-
-.row.small { font-size: 13px; color: var(--ion-color-medium); }
-.col { flex: 1; }
-.label { font-size: 12px; color: var(--ion-color-medium); }
-.value { font-weight: 600; }
-.value-right { text-align: right; }
-
-.extra { margin-top: 8px; font-size: 13px; color: var(--ion-color-medium); display:flex; flex-direction:column; gap:6px }
-.notes { color: var(--ion-color-dark); }
+.card-content { padding: 12px; }
+.row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.label { font-size: 10px; text-transform: uppercase; color: #888; }
+.value { font-weight: 600; font-size: 14px; }
+.total-price { color: var(--ion-color-primary); font-weight: 800; font-size: 1rem; }
 
 .empty {
-	padding: 24px;
-	text-align: center;
-	color: var(--ion-color-medium);
+  padding: 50px 20px;
+  text-align: center;
+  color: #999;
+  ion-icon { font-size: 60px; margin-bottom: 10px; opacity: 0.3; }
 }
 
+/* User pill in header for Tab5 */
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 8px;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#66bb6a,#1b5e20);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+.user-name {
+  font-weight: 600;
+  color: #083712;
+  font-size: 14px;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

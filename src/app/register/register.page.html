@@ -1,0 +1,55 @@
+<ion-content [fullscreen]="true" class="register-content">
+  <div class="register-container">
+    
+    <div class="header">
+      <ion-icon name="person-add-outline" color="primary"></ion-icon>
+      <h1>Crear Cuenta</h1>
+      <p>Únete a nosotros para reservar</p>
+    </div>
+
+    <ion-card class="register-card">
+      <ion-card-content>
+        
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.nombre" placeholder="Nombre completo *" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="card-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.dni" placeholder="DNI / Pasaporte" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="call-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.telefono" placeholder="Teléfono" type="tel"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="mail-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.email" placeholder="Email *" type="email"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="person-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.usuario" placeholder="Usuario para login *" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+          <ion-input [(ngModel)]="newClient.password" placeholder="Contraseña *" type="password"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" (click)="onRegister()" class="register-btn" shape="round">
+          Registrarme
+        </ion-button>
+
+        <div class="footer-links">
+          <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

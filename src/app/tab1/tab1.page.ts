@@ -1,8 +1,11 @@
 import { Component, ViewChildren, ViewChild, QueryList, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { PhotoModalComponent } from '../photo-modal/photo-modal.component';
 import { Router } from '@angular/router';
 import { SearchService } from '../services/search.service';
+import { AuthService } from '../services/auth.service';
+import { UserMenuComponent } from '../user-menu/user-menu.component';
+import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
 
 @Component({
   selector: 'app-tab1',
@@ -61,7 +64,34 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   // store listeners so we can remove them on destroy
   private listenersMap = new Map<HTMLElement, { down: any; up: any; enter: any; leave: any }>();
 
-  constructor(private modalCtrl: ModalController, private router: Router, private searchService: SearchService) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private popoverCtrl: PopoverController,
+    private router: Router,
+    private searchService: SearchService,
+    public auth: AuthService
+  ) {}
+
+  async openUserMenu(ev: Event) {
+    const pop = await this.popoverCtrl.create({
+      component: UserMenuComponent,
+      event: ev,
+      translucent: true,
+    });
+    await pop.present();
+    const { data } = await pop.onDidDismiss();
+    if (data && data.action === 'edit') {
+      const modal = await this.modalCtrl.create({
+        component: UserProfileModalComponent,
+        cssClass: 'user-profile-modal'
+      });
+      await modal.present();
+      const res = await modal.onDidDismiss();
+      if (res && res.data && res.data.updated) {
+        // optionally react to updated user
+      }
+    }
+  }
 
   ngOnInit(): void {
     // populate option arrays

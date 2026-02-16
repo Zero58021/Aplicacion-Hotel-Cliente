@@ -7,7 +7,7 @@
   position: fixed;
   left: 12px;
   /* place the button above the tab bar and respect safe-area-inset */
-  bottom: calc(12px + env(safe-area-inset-bottom));
+  bottom: calc(10px);
   z-index: 14000;
   transform: translateY(0);
 }
@@ -110,7 +110,7 @@
   position: fixed;
   right: 12px;
   /* place the button above the tab bar and respect safe-area-inset */
-  bottom: calc(12px + env(safe-area-inset-bottom));
+  bottom: calc(10px);
   z-index: 14000;
   transform: translateY(0);
   opacity: 0;

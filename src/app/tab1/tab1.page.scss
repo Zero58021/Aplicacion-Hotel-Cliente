@@ -374,6 +374,45 @@
   align-items: flex-start;
   gap: 8px;
 }
+
+/* User pill in header */
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 8px;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#66bb6a,#1b5e20);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+.user-name {
+  font-weight: 600;
+  color: #083712;
+  font-size: 14px;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .header-box .reservation h3 {
   margin: 0;
   font-size: 18px;

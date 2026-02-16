@@ -1,8 +1,17 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Nombre Hotel
+      Super Hotel
     </ion-title>
+    <ion-buttons slot="end" class="user-area">
+      <div class="user-pill" *ngIf="auth.getUser()" (click)="openUserMenu($event)">
+        <div class="user-avatar">{{ auth.getUser().usuario?.charAt(0) | uppercase }}</div>
+        <div class="user-name">{{ auth.getUser().usuario }}</div>
+      </div>
+      <ion-button (click)="auth.logout()" routerLink="/login" routerDirection="root" aria-label="Cerrar sesión">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

@@ -138,6 +138,50 @@
 	color: #7a7a7a;
 }
 
+/* Styled total price badge */
+.total-price {
+	margin-top: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	background: linear-gradient(90deg, #ffffff, #fbfffb);
+	padding: 8px 10px;
+	border-radius: 10px;
+	border: 1px solid rgba(46,125,50,0.06);
+}
+.total-price .total-labels {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+}
+.total-price .total-label {
+	font-weight: 800;
+	color: #16394a;
+	font-size: 13px;
+}
+.total-price .total-meta {
+	font-size: 12px;
+	color: #6b6b6b;
+}
+.total-amount {
+	font-weight: 900;
+	color: #d9383a;
+	font-size: 16px;
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+}
+.total-amount .currency {
+	font-size: 13px;
+	color: #d9383a;
+}
+
+@media (max-width: 560px) {
+	.total-price { padding: 10px; }
+	.total-amount { font-size: 15px; }
+}
+
 .price-right {
 	text-align: right;
 	display: flex;
@@ -268,7 +312,7 @@ ion-button[fill="clear"] {
 	position: fixed;
 	left: 12px;
 	/* place the button above the tab bar and respect safe-area-inset */
-	bottom: calc(12px + env(safe-area-inset-bottom));
+	bottom: calc(10px);
 	z-index: 14000;
 	transform: translateY(0);
 }
