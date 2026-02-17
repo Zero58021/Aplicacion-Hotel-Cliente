@@ -1,78 +1,340 @@
-.room-detail-content { padding: 12px; }
-.room-detail-content { padding: 12px; padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
-.photos { height: 220px; margin: 6px 0 12px 0; }
-.photos-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px }
-.photo-item { min-width:320px; height:220px; flex:0 0 auto; border-radius:10px; overflow:hidden }
-.photo-item img { width:100%; height:100%; object-fit:cover; display:block }
-.section { margin-bottom: 12px }
-.info-grid .info-row { margin:6px 0 }
-.reviews .review { border-bottom:1px solid #eee; padding:8px 0 }
-.review-header { display:flex; justify-content:space-between; align-items:center }
-.review-name { font-weight:600 }
-.review-rating { color:#f5b50a }
-.no-reviews { color:#666; font-style:italic }
-.add-review { margin-top:8px }
-
-/* Footer (fixed) styling to keep submit button visible */
-.room-detail-footer {
-	--background: rgba(255,255,255,0.98);
-	border-top-left-radius: 12px;
-	border-top-right-radius: 12px;
-	box-shadow: 0 -6px 16px rgba(0,0,0,0.08);
-}
-.room-detail-footer .footer-inner {
-	width: 100%;
-	padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
-}
-.room-detail-footer ion-button {
-	--border-radius: 10px;
+/* --- VARIABLES DE COLOR (TEMA VERDE LOKURA) --- */
+:host {
+  --rd-primary: #16a34a;       /* Verde principal */
+  --rd-primary-light: #dcfce7; /* Verde muy clarito (fondos) */
+  --rd-text-dark: #1f2937;
+  --rd-text-medium: #4b5563;
+  --rd-accent: #34d399;        /* Verde menta vibrante */
 }
 
-/* Inner constrained window to make modal look narrower */
-.room-detail-inner {
-	max-width: 520px;
-	margin: 0 20px;
-	background: var(--ion-background-color);
-	border-radius: 10px;
-	overflow: visible;
-	box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-	padding-bottom: 8px;
-}
-.rd-header {
-	display:flex;
-	align-items:center;
-	justify-content:space-between;
-	padding: 12px 16px;
-	font-size:18px;
-	font-weight:600;
-	background: transparent;
-}
-.rd-title { flex:1 }
-.rd-close ion-button { --padding-start: 0; --padding-end: 0 }
+/* Cabecera Limpia */
+ion-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --color: var(--rd-text-dark);
+    --border-width: 0;
+    
+    ion-title {
+      font-weight: 700;
+      color: var(--rd-primary); /* Título en verde */
+    }
 
-/* Ensure footer inner aligns with inner container */
-.room-detail-footer .footer-inner { max-width:520px; margin: 0 20px; }
-
-@media (max-width:420px) {
-	.room-detail-inner { margin: 0 12px; max-width: calc(100% - 24px); }
-	.room-detail-footer .footer-inner { margin: 0 12px; max-width: calc(100% - 24px); }
+    ion-button {
+      --color: var(--rd-text-medium);
+    }
+  }
 }
 
-/* Scroll behaviour: make body scrollable and header sticky */
-.rd-body {
-	max-height: calc(100vh - 220px);
-	overflow: auto;
-	-webkit-overflow-scrolling: touch;
-	padding: 0 12px 12px 12px;
+/* Hero Slider (Fotos) */
+.hero-slider {
+  position: relative;
+  background: #f3f4f6;
 }
-.rd-header {
-	position: sticky;
-	top: 0;
-	z-index: 12;
-	background: var(--ion-background-color);
-}
-.photos-scroll { -webkit-overflow-scrolling: touch; }
 
-ion-fab {
-	z-index: 30;
+.photos-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 0; 
+  height: 260px; /* Un poco más alto */
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.photo-item {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--rd-primary);
+  background: var(--rd-primary-light);
+  
+  ion-icon { font-size: 50px; margin-bottom: 8px; opacity: 0.5; }
+}
+
+.scroll-hint {
+  position: absolute;
+  /* ANTES: bottom: 15px; */
+  /* AHORA: Lo subimos para que no lo tape el contenido blanco */
+  bottom: 40px; 
+  right: 15px;
+  background: rgba(22, 163, 74, 0.85);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  z-index: 5; /* Aseguramos que esté por encima de la foto */
+}
+
+/* Contenido Principal */
+.content-wrapper {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  margin-top: -24px; /* Solapa sobre la foto */
+  position: relative;
+  z-index: 2;
+  min-height: 500px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+}
+
+.main-info {
+  margin-bottom: 20px;
+
+  .info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .room-type.badge {
+    background: var(--rd-primary);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .room-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--rd-text-dark);
+    small { font-size: 0.9rem; font-weight: 500; color: var(--rd-text-medium); }
+  }
+
+  .room-title {
+    margin: 10px 0 5px 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--rd-text-dark);
+    line-height: 1.2;
+  }
+
+  .room-floor {
+    display: flex;
+    align-items: center;
+    color: var(--rd-primary); /* Icono y texto verde */
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    font-size: 0.95rem;
+    
+    ion-icon { margin-right: 6px; font-size: 1.1rem; }
+  }
+
+  .description {
+    line-height: 1.6;
+    color: var(--rd-text-medium);
+    font-size: 0.95rem;
+  }
+}
+
+.separator {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 24px 0;
+}
+
+/* Servicios */
+.amenities-section {
+  h3 { margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 700; color: var(--rd-text-dark); }
+
+  .amenities-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .amenity-chip {
+    display: flex;
+    align-items: center;
+    background: var(--rd-primary-light); /* Fondo verde claro */
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--rd-primary); /* Texto verde oscuro */
+
+    ion-icon { margin-right: 6px; }
+  }
+}
+
+/* Opiniones */
+.reviews-section {
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 20px;
+    
+    h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--rd-text-dark); }
+    .review-count { margin-left: 8px; color: var(--rd-primary); font-weight: 600; font-size: 0.9rem; }
+  }
+}
+
+.review-card {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 16px; /* Tarjetas redondeadas */
+  border: 1px solid #f3f4f6;
+
+  .review-avatar {
+    width: 42px;
+    height: 42px;
+    background: var(--rd-primary); /* Avatar verde */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+  }
+
+  .review-content { flex: 1; }
+
+  .review-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+
+    .r-name { font-weight: 700; font-size: 0.95rem; color: var(--rd-text-dark); }
+    
+    .r-rating {
+      color: #fbbf24; /* Estrellas doradas (se ven mejor sobre fondo claro) */
+      display: flex;
+      ion-icon { font-size: 14px; margin-left: 1px; }
+      .filled { color: #fbbf24; }
+      ion-icon:not(.filled) { color: #d1d5db; }
+    }
+  }
+
+  .r-date { font-size: 0.75rem; color: #9ca3af; display: block; margin-bottom: 8px; }
+  .r-text { margin: 0; font-size: 0.9rem; line-height: 1.4; color: var(--rd-text-medium); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px 0;
+  color: #9ca3af;
+  
+  ion-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; color: var(--rd-primary); }
+  p { margin: 0; font-size: 0.95rem; }
+}
+
+/* Espacio extra al final del scroll: pequeño espacio justo debajo del input de opinión */
+.footer-spacer { height: calc(24px + env(safe-area-inset-bottom)); }
+
+/* --- FOOTER FLOTANTE (ARREGLADO) --- */
+ion-footer.review-footer {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #f3f4f6;
+  
+  /* AQUÍ ESTÁ EL TRUCO DEL ESPACIO ABAJO: */
+  padding-bottom: calc(50px + env(safe-area-inset-bottom)); 
+}
+
+.add-review-box {
+  padding: 16px 20px 0 20px;
+  
+  h4 { 
+    margin: 0 0 12px 0; 
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    color: var(--rd-primary); 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.name-input {
+  flex: 1;
+  --background: #f3f4f6;
+  border-radius: 12px;
+  --padding-start: 12px;
+  font-size: 0.95rem;
+  
+  /* Borde verde al enfocar (opcional si usas variables de Ionic) */
+  --highlight-color-focused: var(--rd-primary);
+}
+
+.rating-select {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  padding: 0 10px;
+  border-radius: 12px;
+  
+  .star-btn {
+    color: #d1d5db;
+    font-size: 22px;
+    margin: 0 2px;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+
+    &:active { transform: scale(1.3); }
+  }
+  
+  /* Estrellas interactivas en verde o dorado? Dorado se ve mejor para rating */
+  .star-btn[name="star"] { color: #fbbf24; }
+}
+
+.comment-input {
+  --background: #f3f4f6;
+  border-radius: 12px;
+  --padding-start: 12px;
+  
+  ion-textarea { margin-top: 0; }
+  
+  /* Botón de enviar */
+  ion-button {
+    --color: var(--rd-primary); /* Icono verde */
+    margin-right: 0;
+    
+    ion-icon { font-size: 24px; }
+  }
+
+/* (antes había un spacer dentro del footer; ahora usamos `.footer-spacer` dentro de `ion-content`) */
+
+  /* Posición del botón "subir" para que quede justo encima del footer de añadir opinión */
+  ion-fab.scroll-top-fab {
+    /* Aseguramos que esté a la derecha y por encima del footer. Ajusta 120px si necesitas más/menos espacio. */
+    right: 18px !important;
+    bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+    z-index: 1100;
+  }
 }

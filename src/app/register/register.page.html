@@ -2,7 +2,9 @@
   <div class="register-container">
     
     <div class="header">
-      <ion-icon name="person-add-outline" color="primary"></ion-icon>
+      <div class="icon-wrap">
+        <ion-icon name="person-add-outline" color="primary"></ion-icon>
+      </div>
       <h1>Crear Cuenta</h1>
       <p>Únete a nosotros para reservar</p>
     </div>
@@ -12,17 +14,23 @@
         
         <ion-item lines="none" class="input-item">
           <ion-icon slot="start" name="person-circle-outline"></ion-icon>
-          <ion-input [(ngModel)]="newClient.nombre" placeholder="Nombre completo *" type="text"></ion-input>
+          <ion-input [(ngModel)]="newClient.nombre" placeholder="Nombre completo *" type="text" autocapitalize="words"></ion-input>
         </ion-item>
 
         <ion-item lines="none" class="input-item">
           <ion-icon slot="start" name="card-outline"></ion-icon>
-          <ion-input [(ngModel)]="newClient.dni" placeholder="DNI / Pasaporte" type="text"></ion-input>
+          <ion-input [(ngModel)]="newClient.dni" placeholder="DNI / NIE / Pasaporte *" type="text" autocapitalize="characters"></ion-input>
         </ion-item>
 
         <ion-item lines="none" class="input-item">
           <ion-icon slot="start" name="call-outline"></ion-icon>
-          <ion-input [(ngModel)]="newClient.telefono" placeholder="Teléfono" type="tel"></ion-input>
+          <ion-input 
+            [(ngModel)]="newClient.telefono" 
+            placeholder="Teléfono (móvil) *" 
+            type="tel" 
+            maxlength="12" 
+            (ionInput)="formatPhone($event)">
+          </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="input-item">

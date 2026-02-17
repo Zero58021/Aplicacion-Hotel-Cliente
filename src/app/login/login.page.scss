@@ -1,3 +1,5 @@
+/* ... TUS ESTILOS ORIGINALES (Mantenlos tal cual) ... */
+
 .login-content {
   --background: linear-gradient(135deg, #f6f8ff 0%, #fff 45%);
   display: flex;
@@ -59,6 +61,10 @@
     border-radius: 50%;
     box-shadow: 0 12px 34px rgba(16,163,74,0.12);
     transition: transform 400ms ease;
+    
+    /* Importante para que el click funcione bien */
+    cursor: pointer;
+    user-select: none;
 
     ion-icon {
       font-size: 42px;
@@ -100,7 +106,6 @@
 }
 
 .login-card.fade-in { animation: fadeUp 420ms ease both; }
-
 .login-card.shake { animation: shake 550ms cubic-bezier(.36,.07,.19,.97); }
 
 @keyframes shake {
@@ -127,7 +132,6 @@
   &:focus-within {
     transform: translateY(-2px);
     box-shadow: 0 8px 26px rgba(2,6,23,0.06);
-
     ion-icon { color: var(--ion-color-primary); }
   }
 
@@ -138,7 +142,7 @@
 }
 
 .login-btn {
-  margin-top: 20px;
+  margin-top: 10px; 
   font-weight: 700;
   border-radius: 12px;
   color: #ffffff !important;
@@ -167,5 +171,118 @@
     color: var(--ion-color-primary);
     text-decoration: none;
     font-weight: 600;
+  }
+}
+
+.remember-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+  margin-bottom: 14px;
+  width: 100%;
+
+  ion-checkbox {
+    --size: 20px;
+    --checkbox-background-checked: #10b981; 
+    --border-color-checked: #10b981;
+    --border-radius: 6px; 
+    --border-width: 1.5px;
+    --border-color: #cbd5e1;
+    --checkmark-color: #ffffff;
+    --transition: background 0.2s ease;
+    
+    font-size: 14px;
+    color: #64748b; 
+    font-weight: 500;
+  }
+
+  .label-text {
+    margin-left: 4px; 
+    letter-spacing: 0.3px;
+  }
+}
+
+/* --- ESTILOS MODO VACACIONES / DISCO --- */
+
+.party-active {
+  /* Cuando se activa el modo fiesta */
+  
+  .logo-wrap {
+    animation: spin-logo 1s infinite linear;
+    background: #fff !important; 
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(255,255,255,0.8) !important;
+  }
+  
+  .logo-wrap ion-icon {
+    animation: rainbow-text 1s infinite linear;
+  }
+}
+
+/* Capa de luces psicodélicas */
+.disco-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+  background-size: 400%;
+  z-index: 0; /* Detrás de las formas pero sobre el fondo base */
+  opacity: 0.3;
+  animation: glowing-bg 20s linear infinite;
+  pointer-events: none;
+}
+
+/* Contenedor de emojis */
+.party-container {
+  position: absolute;
+  top: -50px; /* Empiezan fuera */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.floater {
+  position: absolute;
+  top: -50px;
+  opacity: 0;
+  animation: fallDown ease-in infinite;
+}
+
+/* --- KEYFRAMES --- */
+
+@keyframes spin-logo {
+  0% { transform: rotate(0deg) scale(1.1); box-shadow: 0 0 15px #ff0000; }
+  25% { transform: rotate(90deg) scale(1.1); box-shadow: 0 0 15px #00ff00; }
+  50% { transform: rotate(180deg) scale(1.1); box-shadow: 0 0 15px #0000ff; }
+  75% { transform: rotate(270deg) scale(1.1); box-shadow: 0 0 15px #ffff00; }
+  100% { transform: rotate(360deg) scale(1.1); box-shadow: 0 0 15px #ff0000; }
+}
+
+@keyframes rainbow-text {
+  0% { color: #ff0000; }
+  20% { color: #ffff00; }
+  40% { color: #00ff00; }
+  60% { color: #00ffff; }
+  80% { color: #0000ff; }
+  100% { color: #ff00ff; }
+}
+
+@keyframes glowing-bg {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 0 0; }
+}
+
+@keyframes fallDown {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
   }
 }

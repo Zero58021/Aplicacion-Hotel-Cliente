@@ -1,4 +1,7 @@
-<ion-content [fullscreen]="true" class="login-content">
+<ion-content [fullscreen]="true" class="login-content" [class.party-active]="isPartyMode">
+  
+  <div class="disco-overlay" *ngIf="isPartyMode"></div>
+
   <div class="bg-shapes" aria-hidden="true">
     <span class="shape s1"></span>
     <span class="shape s2"></span>
@@ -8,7 +11,7 @@
   <div class="login-container">
 
     <div class="header">
-      <div class="logo-wrap">
+      <div class="logo-wrap" (click)="onLogoClick()">
         <ion-icon name="happy-outline" color="primary"></ion-icon>
       </div>
       <h1>Bienvenido</h1>
@@ -31,6 +34,12 @@
           </ion-button>
         </ion-item>
 
+        <div class="remember-container">
+          <ion-checkbox mode="ios" [(ngModel)]="rememberMe">
+            <span class="label-text">Recuérdame</span>
+          </ion-checkbox>
+        </div>
+
         <div class="error-msg" *ngIf="errorMsg">
           {{ errorMsg }}
         </div>
@@ -49,4 +58,15 @@
     </div>
 
   </div>
+
+  <div class="party-container" *ngIf="isPartyMode">
+    <div class="floater" *ngFor="let item of partyItems"
+         [style.left.%]="item.left"
+         [style.animationDuration.s]="item.duration"
+         [style.animationDelay.s]="item.delay"
+         [style.fontSize.px]="item.size">
+      {{ item.text }}
+    </div>
+  </div>
+
 </ion-content>
