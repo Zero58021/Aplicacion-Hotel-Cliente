@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -31,14 +32,34 @@ export class ApiService {
     return this.http.post(this.urlReservas, reserva, this.httpOptions);
   }
 
-  // Obtener todas las reservas (GET) - Alias 1
+  // Obtener todas las reservas (GET)
   obtenerReservas(): Observable<any[]> {
     return this.http.get<any[]>(this.urlReservas, this.httpOptions);
   }
 
-  // Obtener todas las reservas (GET) - Alias 2 (para compatibilidad con Tab5)
+  // Alias para compatibilidad
   getReservas(): Observable<any[]> {
     return this.http.get<any[]>(this.urlReservas, this.httpOptions);
+  }
+
+  // --- NUEVO MÉTODO FILTRADO (SOLO ACTIVAS/FUTURAS) ---
+  getReservasActivasCliente(email: string): Observable<any[]> {
+    // Pedimos las reservas filtradas por email al servidor
+    const url = `${this.urlReservas}?email=${email}`;
+
+    return this.http.get<any[]>(url, this.httpOptions).pipe(
+      map(reservas => {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0); // Reseteamos hora para comparar solo fecha (00:00 de hoy)
+
+        // Filtramos: Devolvemos solo aquellas cuya fecha de salida es HOY o DESPUÉS
+        return reservas.filter(reserva => {
+          if (!reserva.fechaSalida) return false; 
+          const fechaSalida = new Date(reserva.fechaSalida);
+          return fechaSalida >= hoy; 
+        });
+      })
+    );
   }
 
   // Cancelar reserva (PATCH)
@@ -64,7 +85,7 @@ export class ApiService {
     return this.http.get<any[]>(url, this.httpOptions);
   }
 
-  // Actualizar una habitación (PATCH) - Comentarios, estado, etc.
+  // Actualizar una habitación (PATCH)
   actualizarHabitacion(id: string | number, body: any): Observable<any> {
     const url = `${this.apiUrl}/habitaciones/${id}`;
     return this.http.patch(url, body, this.httpOptions);
@@ -82,9 +103,8 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/clientes`, this.httpOptions);
   }
 
-  // Actualizar cliente (PATCH) - Contraseña, perfil
+  // Actualizar cliente (PATCH)
   updateCliente(id: string | number, body: any): Observable<any> {
-    // ¡IMPORTANTE! json-server necesita el ID en la URL: /clientes/1
     return this.http.patch(`${this.apiUrl}/clientes/${id}`, body, this.httpOptions);
   }
 }

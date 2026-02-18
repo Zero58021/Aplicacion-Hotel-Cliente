@@ -3,9 +3,8 @@ import { IonicModule, AlertController, ModalController, PopoverController } from
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../services/api';
+import { ApiService } from '../services/api'; // Asegúrate que la ruta es correcta
 import { AuthService } from '../services/auth.service';
-// Ajusta esta ruta si es necesario:
 import { ReservationInfoComponent } from '../tab4/reservation-info.component';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
 import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
@@ -65,17 +64,19 @@ export class Tab5Page implements OnInit {
   }
 
   private async loadReservations() {
-    if (!this.currentUser) return;
+    this.currentUser = this.auth.getUser();
 
-    this.apiService.obtenerReservas().subscribe({
+    if (!this.currentUser || !this.currentUser.email) return;
+
+    // USAMOS EL NUEVO MÉTODO FILTRADO POR FECHA
+    this.apiService.getReservasActivasCliente(this.currentUser.email).subscribe({
       next: (data: any[]) => {
-        // FILTRO: Solo las reservas del usuario logueado
-        const misReservas = data.filter(r => 
-          r.email && r.email.toLowerCase() === this.currentUser.email.toLowerCase()
-        );
-        this.reservations = misReservas.reverse();
+        // Ordenamos: Las más próximas primero (fechaEntrada ascendente)
+        this.reservations = data.sort((a, b) => {
+          return new Date(a.fechaEntrada).getTime() - new Date(b.fechaEntrada).getTime();
+        });
       },
-      error: (err: any) => console.error('Error:', err)
+      error: (err: any) => console.error('Error cargando reservas:', err)
     });
   }
 
@@ -117,11 +118,11 @@ export class Tab5Page implements OnInit {
         { text: 'No', role: 'cancel' },
         {
           text: 'Sí, cancelar',
-            handler: () => {
-              this.apiService.cancelarReserva(res.id).subscribe(() => {
-                this.loadReservations();
-              });
-            }
+          handler: () => {
+            this.apiService.cancelarReserva(res.id).subscribe(() => {
+              this.loadReservations();
+            });
+          }
         }
       ]
     });
