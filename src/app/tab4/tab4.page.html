@@ -1,81 +1,147 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="bg-light">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Resumen de reserva</ion-title>
+      <ion-title size="large">Resumen y Pago</ion-title>
     </ion-toolbar>
   </ion-header>
-
-  <ion-grid>
-    <!-- Resumen de costos -->
-  </ion-grid>
 
   <div class="center-container">
     <ion-grid>
       <ion-row class="ion-justify-content-center">
-        <ion-col size="12" size-md="8" size-lg="4">
-          <ion-card class="summary-card">
-          <ion-card-header>
-            <ion-card-title>Reserva</ion-card-title>
-            <div class="summary-actions">
-              <ion-button fill="clear" size="small" (click)="openInfo($event)">Info</ion-button>
+        <ion-col size="12" size-md="8" size-lg="5">
+
+          <ion-card class="summary-card shadow-card">
+            <div class="summary-header-top">
+              <ion-card-title>Detalle del importe</ion-card-title>
+              <ion-button fill="clear" size="small" color="primary" (click)="openInfo($event)">Ver info</ion-button>
             </div>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="summary-line">
-              <div class="label"><strong>Habitación:</strong></div>
-              <div class="value">
-                <span *ngIf="selectedRoom">
-                  <ng-container *ngIf="nights > 0; else perNightRoom">
-                    {{ roomCost | number:'1.2-2' }} € <small>({{ nights }} noches)</small>
-                  </ng-container>
-                  <ng-template #perNightRoom>
-                      {{ (selectedRoom.price * (criteria?.rooms || 1)) | number:'1.2-2' }} € <small>(por noche total)</small>
-                    </ng-template>
-                </span>
-                <span *ngIf="!selectedRoom">—</span>
+            
+            <ion-card-content>
+              <div class="summary-line">
+                <div class="label">Alojamiento ({{ nights }} noches)</div>
+                <div class="value">
+                  <span *ngIf="selectedRoom">{{ roomCost | number:'1.2-2' }} €</span>
+                  <span *ngIf="!selectedRoom">—</span>
+                </div>
               </div>
-            </div>
-            <div class="summary-line">
-              <div class="label"><strong>Pensión:</strong></div>
-              <div class="value">
-                <span *ngIf="selectedPension">
-                  <ng-container *ngIf="nights > 0; else perDayPension">
-                    {{ pensionCost | number:'1.2-2' }} €
-                  </ng-container>
-                  <ng-template #perDayPension>
-                    {{ ( (selectedPension.price || 0) * ((criteria?.adults || 0) + (criteria?.children || 0)) ) | number:'1.2-2' }} € <small>(por día total)</small>
-                  </ng-template>
-                </span>
-                <span *ngIf="!selectedPension">—</span>
+              <div class="summary-line">
+                <div class="label">Pensión / Extras</div>
+                <div class="value">
+                  <span *ngIf="selectedPension">{{ pensionCost | number:'1.2-2' }} €</span>
+                  <span *ngIf="!selectedPension">—</span>
+                </div>
               </div>
-            </div>
-            <hr class="summary-sep" />
-            <div class="summary-total summary-line">
-              <div class="label"><strong>Total:</strong></div>
-              <div class="value">
-                <span *ngIf="(selectedRoom || selectedPension)">
-                  <ng-container *ngIf="nights > 0; else perNightTotal">
-                    {{ totalCost | number:'1.2-2' }} €
-                  </ng-container>
-                  <ng-template #perNightTotal>
-                      {{ ( ((selectedRoom?.price || 0) * (criteria?.rooms || 1)) + ((selectedPension?.price || 0) * ((criteria?.adults || 0) + (criteria?.children || 0))) ) | number:'1.2-2' }} € <small>(por noche/día)</small>
-                    </ng-template>
-                </span>
-                <span *ngIf="!selectedRoom && !selectedPension">—</span>
+              
+              <div class="summary-sep"></div>
+              
+              <div class="summary-total summary-line">
+                <div class="label"><strong>Total a pagar:</strong></div>
+                <div class="value total-price">
+                  <span *ngIf="(selectedRoom || selectedPension)">{{ totalCost | number:'1.2-2' }} €</span>
+                  <span *ngIf="!selectedRoom && !selectedPension">—</span>
+                </div>
               </div>
-            </div>
             </ion-card-content>
           </ion-card>
 
-          <div class="center-actions">
-            <div class="payment-options">
-              <ion-segment [(ngModel)]="paymentMethod" value="online" class="payment-segment">
-                <ion-segment-button value="online">Pago online</ion-segment-button>
-                <ion-segment-button value="inperson">Pago físico</ion-segment-button>
-              </ion-segment>
+          <h3 class="payment-title" *ngIf="!paymentMethod">¿Cómo prefieres pagar?</h3>
+
+          <div class="payment-selection-cards">
+            <div class="pay-card" [class.active]="paymentMethod === 'online'" (click)="paymentMethod = 'online'">
+              <div class="pay-icon">
+                <ion-icon name="card-outline"></ion-icon>
+              </div>
+              <span class="pay-title">Pago Online</span>
+              <span class="pay-subtitle">Tarjeta o GPay</span>
+            </div>
+            
+            <div class="pay-card" [class.active]="paymentMethod === 'inperson'" (click)="paymentMethod = 'inperson'">
+              <div class="pay-icon">
+                <ion-icon name="business-outline"></ion-icon>
+              </div>
+              <span class="pay-title">En el Hotel</span>
+              <span class="pay-subtitle">Al hacer check-in</span>
+            </div>
+          </div>
+
+          <div class="payment-section">
+
+            <div class="payment-details fade-in" *ngIf="paymentMethod === 'online'">
+              
+              <button class="gpay-button" (click)="payWithGooglePay($event)">
+                <ion-icon name="logo-google"></ion-icon>
+                <span>Pay</span>
+              </button>
+
+              <div class="divider">
+                <span>o paga con tarjeta</span>
+              </div>
+
+              <div class="credit-card-form">
+                <div class="input-field">
+                  <label>Número de Tarjeta</label>
+                  <div class="input-wrapper">
+                    
+                    <div class="brand-icon">
+                      <img *ngIf="cardBrand === 'santander'" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Banco_Santander_Logotipo.svg" alt="Santander">
+                      <img *ngIf="cardBrand === 'bbva'" src="assets/logos tarjeta/bbva.jpg" alt="BBVA">
+                      <img *ngIf="cardBrand === 'caixabank'" src="assets/logos tarjeta/caixabank.png" alt="CaixaBank">
+                      <img *ngIf="cardBrand === 'ing'" src="assets/logos tarjeta/ing.png" alt="ING">
+                      <img *ngIf="cardBrand === 'bankinter'" src="assets/logos tarjeta/bankinter.png" alt="Bankinter">
+                      
+                      <img *ngIf="cardBrand === 'visa'" src="assets/logos tarjeta/visa.png" alt="Visa">
+                      <img *ngIf="cardBrand === 'mastercard'" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="Mastercard">
+                      <img *ngIf="cardBrand === 'amex'" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex">
+                      
+                      <ion-icon *ngIf="cardBrand === 'unknown'" name="card-outline" class="field-icon-fallback"></ion-icon>
+                    </div>
+
+                    <input type="tel" [value]="cardDetails.number" (input)="onCardNumberChange($event)" placeholder="0000 0000 0000 0000" maxlength="19" class="card-input">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="input-field half">
+                    <label>Caducidad</label>
+                    <input type="tel" [value]="cardDetails.expiry" (input)="onExpiryChange($event)" placeholder="MM/AA" maxlength="5">
+                  </div>
+                  <div class="input-field half">
+                    <label>CVV</label>
+                    <div class="input-wrapper">
+                      <input type="tel" [value]="cardDetails.cvv" (input)="onCvvChange($event)" placeholder="•••" [maxLength]="cardBrand === 'amex' ? 4 : 3">
+                      <ion-icon name="lock-closed-outline" class="field-icon right"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-field">
+                  <label>Titular de la Tarjeta</label>
+                  <input type="text" [(ngModel)]="cardDetails.name" placeholder="Nombre completo">
+                </div>
+              </div>
             </div>
 
-            <ion-button class="finalize-btn" expand="block" color="primary" (click)="finalizePayment($event)">FINALIZAR PAGO</ion-button>
+            <div class="payment-details inperson-info fade-in" *ngIf="paymentMethod === 'inperson'">
+              <div class="info-icon-wrapper">
+                <ion-icon name="wallet"></ion-icon>
+              </div>
+              <h3>Pago en mostrador</h3>
+              <p>Tu reserva quedará <strong>confirmada al instante</strong> sin cargos en tu cuenta el día de hoy.</p>
+              <p class="sub-text">Abonarás el importe total ({{ totalCost | number:'1.2-2' }} €) en recepción durante el check-in. Aceptamos efectivo y tarjeta física.</p>
+            </div>
+
+            <div class="center-actions fade-in" *ngIf="paymentMethod">
+              <ion-button 
+                class="finalize-btn" 
+                expand="block" 
+                color="primary" 
+                (click)="finalizePayment($event)"
+                [disabled]="paymentMethod === 'online' && !isCardValid()">
+                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                CONFIRMAR Y PAGAR
+              </ion-button>
+            </div>
+
           </div>
         </ion-col>
       </ion-row>
@@ -84,19 +150,19 @@
 
 </ion-content>
 
-<!-- Success overlay with animated tick -->
 <div class="success-overlay" *ngIf="paymentSuccess">
   <div class="success-card" role="status" aria-live="polite">
     <svg class="checkmark" viewBox="0 0 52 52">
       <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
       <path class="checkmark__check" fill="none" d="M14 27 l8 8 l16 -16" />
     </svg>
-    <div class="success-text">Pago confirmado</div>
+    <div class="success-text">¡Reserva Confirmada!</div>
+    <p class="success-sub">Preparando tus vacaciones...</p>
   </div>
 </div>
 
-  <div class="page-bottom-spacer"></div>
+<div class="page-bottom-spacer"></div>
 
-  <div class="bottom-left-button">
-    <ion-button fill="outline" (click)="goToTab3($event)">ANTERIOR</ion-button>
-  </div>
+<div class="bottom-left-button">
+  <ion-button class="back-button" fill="outline" (click)="goToTab3($event)">ATRÁS</ion-button>
+</div>

@@ -7,7 +7,6 @@ import { SelectionService } from '../services/selection.service';
 import { SearchService, SearchCriteria } from '../services/search.service';
 import { Router } from '@angular/router';
 import { ReservationInfoComponent } from './reservation-info.component';
-// IMPORTANTE: Importamos el servicio de conexión
 import { ApiService } from '../services/api';
 
 @Component({
@@ -32,10 +31,19 @@ export class Tab4Page implements OnInit, OnDestroy {
 
   private sub?: Subscription;
   private criteriaSub?: Subscription;
-  paymentMethod: 'online' | 'inperson' = 'online';
+  
+  paymentMethod: 'online' | 'inperson' | null = null; 
   paymentSuccess = false;
 
-  // Inyectamos ApiService en el constructor
+  // --- DATOS DE LA TARJETA Y MARCA (AHORA CON BANCOS DE ESPAÑA) ---
+  cardBrand: 'santander' | 'bbva' | 'caixabank' | 'ing' | 'bankinter' | 'visa' | 'mastercard' | 'amex' | 'unknown' = 'unknown';
+  cardDetails = {
+    number: '',
+    expiry: '',
+    cvv: '',
+    name: ''
+  };
+
   constructor(
     private selectionService: SelectionService, 
     private searchService: SearchService, 
@@ -49,10 +57,17 @@ export class Tab4Page implements OnInit, OnDestroy {
     this.selectionService.loadFromStorage();
     this.sub = this.selectionService.selectedRoom$.subscribe(r => this.selectedRoom = r);
     this.criteriaSub = this.searchService.criteria$.subscribe(c => this.criteria = c);
+  }
 
+  ionViewWillEnter() {
+    this.cargarDatosTemporales();
+  }
+
+  cargarDatosTemporales() {
     try {
       const sp = localStorage.getItem('selectedPension');
       if (sp !== null) this.selectedPensionId = sp;
+      
       const ps = localStorage.getItem('reservationPassengers');
       if (ps) {
         const parsed = JSON.parse(ps) || [];
@@ -66,6 +81,8 @@ export class Tab4Page implements OnInit, OnDestroy {
           allergies: p.allergies || '',
           type: p.type || 'adult'
         }));
+      } else {
+        this.passengers = [];
       }
     } catch (e) { }
   }
@@ -124,50 +141,123 @@ export class Tab4Page implements OnInit, OnDestroy {
           criteria: this.criteria,
           selectedRoom: this.selectedRoom,
           selectedPension: this.selectedPension,
-          passengers: this.passengers
+          passengers: this.passengers 
         }
       }
     });
     await modal.present();
   }
 
+  // ==========================================
+  // LÓGICA DE FORMATEO Y DETECCIÓN DE BANCOS
+  // ==========================================
+
+  onCardNumberChange(event: any) {
+    const inputElement = event.target;
+    // Extraemos solo los números
+    let input = inputElement.value.replace(/\D/g, ''); 
+    
+    // DETECCIÓN DE BANCO ESPAÑOL Y MARCA
+    if (input.startsWith('41')) {
+      this.cardBrand = 'santander';
+    } else if (input.startsWith('42')) {
+      this.cardBrand = 'bbva';
+    } else if (input.startsWith('43')) {
+      this.cardBrand = 'caixabank';
+    } else if (input.startsWith('44')) {
+      this.cardBrand = 'ing';
+    } else if (input.startsWith('45')) {
+      this.cardBrand = 'bankinter';
+    } else if (input.startsWith('4')) {
+      this.cardBrand = 'visa';
+    } else if (input.startsWith('5') || input.startsWith('2')) {
+      this.cardBrand = 'mastercard';
+    } else if (input.startsWith('3')) {
+      this.cardBrand = 'amex'; 
+    } else {
+      this.cardBrand = 'unknown';
+    }
+
+    // Insertar un espacio cada 4 números para que quede bonito
+    let formatted = input.match(/.{1,4}/g)?.join(' ') || '';
+    
+    this.cardDetails.number = formatted;
+    inputElement.value = formatted; 
+  }
+
+  onExpiryChange(event: any) {
+    const inputElement = event.target;
+    let input = inputElement.value.replace(/\D/g, '');
+    
+    let formatted = input;
+    if (input.length > 2) {
+      formatted = input.substring(0, 2) + '/' + input.substring(2, 4);
+    }
+    
+    this.cardDetails.expiry = formatted;
+    inputElement.value = formatted;
+  }
+
+  onCvvChange(event: any) {
+    const inputElement = event.target;
+    let input = inputElement.value.replace(/\D/g, '');
+    
+    const maxLength = this.cardBrand === 'amex' ? 4 : 3;
+    let formatted = input.substring(0, maxLength);
+    
+    this.cardDetails.cvv = formatted;
+    inputElement.value = formatted;
+  }
+
+  isCardValid(): boolean {
+    if (this.paymentMethod !== 'online') return true;
+    
+    const numRaw = this.cardDetails.number.replace(/\s/g, '');
+    const expRaw = this.cardDetails.expiry;
+    const cvvRaw = this.cardDetails.cvv;
+    
+    const isNumValid = (this.cardBrand === 'amex' && numRaw.length === 15) || (numRaw.length === 16);
+    const isExpValid = expRaw.length === 5; 
+    const isCvvValid = cvvRaw.length === (this.cardBrand === 'amex' ? 4 : 3);
+    const isNameValid = this.cardDetails.name.trim().length > 3;
+
+    return isNumValid && isExpValid && isCvvValid && isNameValid;
+  }
+
+  // ==========================================
+  // PROCESO DE PAGO
+  // ==========================================
+
+  async payWithGooglePay(ev?: Event) {
+    if (ev) ev.stopPropagation();
+    const processing = await this.alertCtrl.create({ header: 'Conectando con Google Pay...', message: 'Por favor, espera.', buttons: [] });
+    await processing.present();
+    setTimeout(async () => {
+      await processing.dismiss();
+      this.showSuccessAnimation();
+    }, 1500);
+  }
+
   async finalizePayment(ev?: Event) {
     if (ev) ev.stopPropagation();
+    if (!this.paymentMethod) return; 
 
     if (this.paymentMethod === 'online') {
-      const confirm = await this.alertCtrl.create({
-        header: 'Pagar online',
-        message: 'Será redirigido a la pasarela de pago. ¿Desea continuar?',
-        buttons: [
-          { text: 'Cancelar', role: 'cancel' },
-          {
-            text: 'Continuar',
-            handler: async () => {
-              const processing = await this.alertCtrl.create({ header: 'Procesando', message: 'Procesando pago...', buttons: [] });
-              await processing.present();
-              setTimeout(async () => {
-                await processing.dismiss();
-                this.showSuccessAnimation();
-              }, 900);
-            }
-          }
-        ]
-      });
-      await confirm.present();
+      const processing = await this.alertCtrl.create({ header: 'Procesando Tarjeta', message: 'Validando pago seguro...', buttons: [] });
+      await processing.present();
+      setTimeout(async () => {
+        await processing.dismiss();
+        this.showSuccessAnimation();
+      }, 1500);
       return;
     }
 
     const confirmInPerson = await this.alertCtrl.create({
-      header: 'Pagar en persona',
-      message: 'Ha seleccionado pagar en persona. La reserva quedará registrada y podrá abonar al llegar. ¿Desea confirmar la reserva?',
+      header: 'Confirmar Reserva',
+      message: 'La reserva quedará registrada y abonarás el importe en recepción. ¿Desea confirmar la reserva?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Confirmar',
-          handler: async () => {
-            this.showSuccessAnimation();
-          }
-        }
+        { text: 'Confirmar', handler: async () => { this.showSuccessAnimation(); } }
       ]
     });
     await confirmInPerson.present();
@@ -181,9 +271,7 @@ export class Tab4Page implements OnInit, OnDestroy {
           const primary = this.passengers.find(p => p.isPrimary) || this.passengers[0] || {} as any;
           const nombre = ((primary.name || '') + ' ' + (primary.lastName || '')).trim() || 'Cliente';
           
-          // CONSTRUIMOS EL OBJETO RESERVA
           const reservation = {
-            // Nota: JSON-Server prefiere IDs que genera él, pero si quieres enviarlo tú:
             id: 'R-' + Math.floor(Math.random() * 900000 + 100000),
             nombreCliente: nombre,
             email: primary.email || '',
@@ -225,7 +313,6 @@ export class Tab4Page implements OnInit, OnDestroy {
             notas: primary.allergies || ''
           };
 
-          // LLAMADA NUEVA: ENVIAR AL SERVIDOR
           await this.addReservationToStorage(reservation);
 
         } catch (e) { console.error('Error creando reserva tras pago:', e); }
@@ -236,26 +323,17 @@ export class Tab4Page implements OnInit, OnDestroy {
     }, 2200);
   }
 
-  // ESTA ES LA FUNCIÓN QUE CAMBIA RADICALMENTE
   private async addReservationToStorage(reservation: any) {
-    console.log('Enviando reserva al servidor...', reservation);
-
     this.apiService.crearReserva(reservation).subscribe({
       next: async (res: any) => {
-        console.log('Reserva guardada con éxito en el servidor', res);
-        
-        // Limpiamos datos temporales del móvil
         localStorage.removeItem('reservationPassengers');
         localStorage.removeItem('selectedPension');
-        
-        // Navegamos al historial
         try { this.router.navigateByUrl('/tabs/tab5'); } catch(e) {}
       },
       error: async (err: any) => {
-        console.error('Error conectando con el servidor', err);
         const alert = await this.alertCtrl.create({
           header: 'Error de Conexión',
-          message: 'No se pudo guardar la reserva en el servidor. Asegúrate de que el PC tiene json-server encendido.',
+          message: 'No se pudo guardar la reserva en el servidor.',
           buttons: ['OK']
         });
         await alert.present();

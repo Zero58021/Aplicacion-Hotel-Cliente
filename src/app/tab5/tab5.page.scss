@@ -25,7 +25,6 @@
   z-index: 30;
 }
 
-
 .reservations-container {
   padding: 12px;
   display: flex;
@@ -44,27 +43,44 @@
   &.cancelled {
     border-left-color: var(--ion-color-danger);
     opacity: 0.7;
-    .name { text-decoration: line-through; }
+    .name { text-decoration: line-through; color: #888; }
   }
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Ajustado para alinear arriba */
   padding: 12px;
   background: #fdfdfd;
 }
 
+.header-left {
+  flex: 1; /* Para que empuje a los botones a la derecha */
+}
+
 .header-left .name { font-size: 1.1rem; font-weight: 700; color: #111; }
-.header-left .meta { font-size: 0.8rem; }
+.header-left .meta { font-size: 0.8rem; margin-top: 4px; }
 .cancel-text { color: var(--ion-color-danger); font-weight: 600; }
+
+.header-right {
+  display: flex;
+  gap: 2px; /* Separación mínima entre botones */
+}
+
+/* Ajuste de padding en los botones para que quepan 3 sin problemas */
+.header-right ion-button {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+}
 
 .card-content { padding: 12px; }
 .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .label { font-size: 10px; text-transform: uppercase; color: #888; }
-.value { font-weight: 600; font-size: 14px; }
+.value { font-weight: 600; font-size: 14px; color: #333; }
 .total-price { color: var(--ion-color-primary); font-weight: 800; font-size: 1rem; }
+.value-right { text-align: right; }
 
 .empty {
   padding: 50px 20px;

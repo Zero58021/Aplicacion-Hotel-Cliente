@@ -7,52 +7,290 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, CommonModule],
   selector: 'app-reservation-info',
   template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Información reserva</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="close()">Cerrar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="ion-padding">
-      <h3>Datos de la reserva</h3>
-      <p>Entrada: {{ fmtDate(data?.criteria?.checkin) }} — Salida: {{ fmtDate(data?.criteria?.checkout) }}</p>
-      <p>Adultos: {{ data?.criteria?.adults ?? '-' }} · Niños: {{ data?.criteria?.children ?? '-' }} · Habitaciones: {{ data?.criteria?.rooms ?? '-' }}</p>
 
-      <h3>Habitación escogida</h3>
-      <p>Nombre: {{ data?.selectedRoom?.name ?? '-' }}</p>
-      <p>Tipo: {{ data?.selectedRoom?.type ?? '-' }} · Planta: {{ data?.selectedRoom?.floor ?? '-' }}</p>
-      <p>Precio por noche: {{ data?.selectedRoom?.price ?? '-' }} €</p>
-      <p>Extras: {{ data?.selectedRoom?.amenities?.length ? (data.selectedRoom.amenities.join(', ')) : 'Sin extras' }}</p>
 
-      <h3>Pensión escogida</h3>
-      <p>Nombre: {{ data?.selectedPension?.name ?? '-' }}</p>
-      <p>Incluye: {{ data?.selectedPension?.includes?.length ? (data.selectedPension.includes.join(', ')) : '-' }}</p>
-      <p>Precio por persona/día: {{ data?.selectedPension?.price ?? '-' }} €</p>
+    <ion-content class="bg-light ion-padding">
+      
+      <div class="ticket-container">
+        
+        <div class="ticket-header">
+          <ion-icon name="bed-outline"></ion-icon>
+          <h2>Boleto de Reserva</h2>
+          <p>Revisa tu información antes del pago</p>
+        </div>
 
-      <h3>Pasajeros</h3>
-      <div *ngIf="data?.passengers && data.passengers.length; else none">
-        <ion-list>
-          <ion-item *ngFor="let p of data.passengers">
-            <ion-label>
-              <h3>{{ p.name || '-' }} {{ p.lastName || '' }} <small *ngIf="p.isPrimary">(Titular)</small></h3>
-              <p>DNI: {{ p.dni || '—' }} · Tel: {{ p.phone || '—' }} · Email: {{ p.email || '—' }}</p>
-              <p *ngIf="p.allergies">Alergias: {{ p.allergies }}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+        <div class="ticket-section">
+          <div class="section-title">
+            <ion-icon name="calendar-outline"></ion-icon> Estancia
+          </div>
+          <div class="grid-2">
+            <div class="data-block">
+              <span class="label">Fecha Entrada</span>
+              <span class="value">{{ fmtDate(data?.criteria?.checkin) }}</span>
+            </div>
+            <div class="data-block">
+              <span class="label">Fecha Salida</span>
+              <span class="value">{{ fmtDate(data?.criteria?.checkout) }}</span>
+            </div>
+            <div class="data-block">
+              <span class="label">Huéspedes</span>
+              <span class="value">{{ data?.criteria?.adults ?? 0 }} Ad, {{ data?.criteria?.children ?? 0 }} Ni</span>
+            </div>
+            <div class="data-block">
+              <span class="label">Habitaciones</span>
+              <span class="value">{{ data?.criteria?.rooms ?? 1 }}</span>
+            </div>
+            
+            <div class="data-block full-width" *ngIf="data?.criteria">
+              <span class="label">Mascotas</span>
+              <span class="value" [class.text-success]="data?.criteria?.pets">
+                <ion-icon [name]="data?.criteria?.pets ? 'paw' : 'close-circle-outline'"></ion-icon> 
+                {{ data?.criteria?.pets ? 'Sí, viaja con mascota' : 'No lleva mascota' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-divider dashed"></div>
+
+        <div class="ticket-section">
+          <div class="section-title">
+            <ion-icon name="key-outline"></ion-icon> Alojamiento
+          </div>
+          <div class="info-row">
+            <span class="info-label">Habitación</span>
+            <span class="info-val fw-bold">{{ data?.selectedRoom?.name ?? 'Sin seleccionar' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Detalles</span>
+            <span class="info-val">{{ data?.selectedRoom?.type ?? '-' }} • Planta {{ data?.selectedRoom?.floor ?? '-' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Extras</span>
+            <span class="info-val text-muted">{{ data?.selectedRoom?.amenities?.length ? (data.selectedRoom.amenities.join(', ')) : 'Sin extras' }}</span>
+          </div>
+        </div>
+
+        <div class="ticket-divider dashed"></div>
+
+        <div class="ticket-section">
+          <div class="section-title">
+            <ion-icon name="restaurant-outline"></ion-icon> Régimen
+          </div>
+          <div class="info-row">
+            <span class="info-label">Pensión</span>
+            <span class="info-val fw-bold">{{ data?.selectedPension?.name ?? 'Solo alojamiento' }}</span>
+          </div>
+          <div class="info-row" *ngIf="data?.selectedPension?.includes?.length">
+            <span class="info-label">Incluye</span>
+            <span class="info-val">{{ data.selectedPension.includes.join(' • ') }}</span>
+          </div>
+        </div>
+
+        <div class="ticket-divider dashed"></div>
+
+        <div class="ticket-section pb-0">
+          <div class="section-title">
+            <ion-icon name="people-outline"></ion-icon> Ocupantes ({{ passengersList.length }})
+          </div>
+
+          <div *ngIf="passengersList.length > 0; else none">
+            
+            <div class="passenger-card" *ngFor="let p of passengersList" [class.is-primary]="p.isPrimary">
+              <div class="p-header">
+                <ion-icon [name]="p.isPrimary ? 'star' : 'person'"></ion-icon>
+                <strong>{{ p.name || 'Falta nombre' }} {{ p.lastName || '' }}</strong>
+                <ion-badge color="primary" *ngIf="p.isPrimary" mode="ios">TITULAR</ion-badge>
+                <ion-badge color="medium" *ngIf="!p.isPrimary" mode="ios">{{ p.type === 'adult' ? 'Adulto' : 'Niño' }}</ion-badge>
+              </div>
+              <div class="p-body">
+                <div class="p-row"><span>DNI:</span> {{ p.dni || 'No indicado' }}</div>
+                <div class="p-row" *ngIf="p.phone"><span>Tel:</span> {{ p.phone }}</div>
+                <div class="p-row" *ngIf="p.email"><span>Email:</span> {{ p.email }}</div>
+                <div class="p-row text-danger" *ngIf="p.allergies">
+                  <span>Alergias:</span> <strong>{{ p.allergies }}</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <ng-template #none>
+            <div class="empty-passengers">No hay datos de huéspedes registrados.</div>
+          </ng-template>
+        </div>
+
       </div>
-      <ng-template #none>
-        <p>No hay pasajeros definidos.</p>
-      </ng-template>
+
+      <div class="button-container">
+        <ion-button expand="block" shape="round" color="dark" (click)="close()" class="close-btn">
+          CERRAR RESUMEN
+        </ion-button>
+      </div>
+      
     </ion-content>
-  `
+  `,
+  styles: [`
+    :host {
+      --ion-background-color: #f4f5f8;
+    }
+    .bg-light {
+      --background: #f4f5f8;
+    }
+
+    /* Diseño del Boleto / Ticket */
+    .ticket-container {
+      background: #ffffff;
+      border-radius: 16px;
+      margin: 10px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticket-header {
+      background: linear-gradient(135deg, var(--ion-color-primary), #11823b);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .ticket-header ion-icon {
+      font-size: 2.8rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .ticket-header h2 { margin: 0; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px;}
+    .ticket-header p { margin: 4px 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+    /* Efecto de perforación del ticket */
+    .ticket-divider.dashed {
+      height: 1px;
+      background: transparent;
+      border-top: 2px dashed #ddd;
+      margin: 0 20px;
+      position: relative;
+    }
+    .ticket-divider.dashed::before, .ticket-divider.dashed::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: #f4f5f8;
+      border-radius: 50%;
+    }
+    .ticket-divider.dashed::before {
+      left: -30px;
+      box-shadow: inset -2px 0 4px rgba(0,0,0,0.03);
+    }
+    .ticket-divider.dashed::after {
+      right: -30px;
+      box-shadow: inset 2px 0 4px rgba(0,0,0,0.03);
+    }
+
+    .ticket-section {
+      padding: 20px;
+    }
+    .pb-0 { padding-bottom: 20px; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #222;
+      margin-bottom: 16px;
+    }
+    .section-title ion-icon {
+      color: var(--ion-color-primary);
+      font-size: 1.4rem;
+    }
+
+    /* Grid para las fechas */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .data-block { display: flex; flex-direction: column; }
+    .data-block.full-width { grid-column: 1 / -1; margin-top: 4px; }
+    
+    .data-block .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+    .data-block .value { font-size: 0.95rem; font-weight: 700; color: #111; display:flex; align-items:center; gap: 4px; }
+    
+    .text-success { color: var(--ion-color-success) !important; }
+
+    /* Filas de información (Habitación / Pensión) */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: #666; font-weight: 500; }
+    .info-val { color: #222; text-align: right; max-width: 65%; }
+    .fw-bold { font-weight: 700; font-size: 1.05rem; }
+    .text-muted { color: #888; font-size: 0.85rem; line-height: 1.3;}
+
+    /* Tarjetas de Pasajeros */
+    .passenger-card {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .passenger-card:last-child { margin-bottom: 0; }
+    
+    /* Resaltar Tarjeta Titular */
+    .passenger-card.is-primary {
+      background: rgba(var(--ion-color-primary-rgb), 0.05);
+      border: 1.5px solid rgba(var(--ion-color-primary-rgb), 0.3);
+    }
+
+    .p-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 8px;
+    }
+    .p-header ion-icon { color: var(--ion-color-primary); font-size: 1.2rem; }
+    .p-header strong { font-size: 0.95rem; color: #222; flex: 1; }
+    
+    .p-body { font-size: 0.85rem; color: #555; display:flex; flex-direction:column; gap: 6px; }
+    .p-row span { font-weight: 700; color: #333; width: 60px; display: inline-block; }
+    .text-danger { color: var(--ion-color-danger); background: rgba(var(--ion-color-danger-rgb), 0.1); padding: 6px 8px; border-radius: 6px; margin-top: 2px;}
+
+    .empty-passengers { color: #888; font-style: italic; text-align: center; padding: 10px; }
+
+    /* Botón de cierre */
+    .button-container {
+      margin-top: 24px;
+      margin-bottom: 30px;
+    }
+    .close-btn {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  `]
 })
 export class ReservationInfoComponent {
   @Input() data: any;
 
   constructor(private modalCtrl: ModalController) {}
+
+  // Ordenamos los pasajeros para que el Titular (isPrimary) siempre salga el primero en la lista
+  get passengersList() {
+    if (!this.data?.passengers) return [];
+    return [...this.data.passengers].sort((a, b) => {
+      if (a.isPrimary === b.isPrimary) return 0;
+      return a.isPrimary ? -1 : 1;
+    });
+  }
 
   fmtDate(d: any) {
     try { return d ? new Date(d).toLocaleDateString() : '-'; } catch { return '-'; }

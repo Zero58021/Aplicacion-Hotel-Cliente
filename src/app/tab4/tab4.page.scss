@@ -1,21 +1,318 @@
-/* Styles for tab4: add top spacing and bottom button like tab3 */
+/* Fondo y padding general */
 :host {
-  --ion-background-color: transparent;
+  --ion-background-color: #f4f5f8;
 }
+.bg-light { --background: #f4f5f8; }
 
-/* small padding to avoid overlap with content and add top space */
 .ion-padding { padding-bottom: 72px; padding-top: 25px; }
 
-/* Fixed bottom-left navigation button (same as tab3) */
+/* Botones inferiores flotantes */
 .bottom-left-button {
   position: fixed;
-  left: 12px;
-  /* place the button above the tab bar and respect safe-area-inset */
+  left: 16px;
   bottom: calc(10px);
   z-index: 14000;
-  transform: translateY(0);
 }
 .bottom-left-button ion-button {
+  border-radius: 30px;
+  font-weight: 600;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.page-bottom-spacer {
+  height: calc(80px + env(safe-area-inset-bottom));
+  width: 100%;
+}
+
+/* Contenedor central - Clave para el centrado vertical */
+.center-container {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  padding: 16px 12px 100px 12px;
+  box-sizing: border-box;
+}
+
+/* Opciones de pago arriba del todo */
+.payment-options {
+  display: flex;
+  justify-content: center;
+}
+.top-options { margin-bottom: 24px; }
+
+.payment-segment {
+  max-width: 400px;
+  width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  padding: 4px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.payment-segment ion-segment-button {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Tarjeta de Resumen */
+.shadow-card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+}
+.summary-card { margin-top: 0; margin-bottom: 24px; }
+.summary-header-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 16px 0 16px; }
+.summary-header-top ion-card-title { font-size: 1.1rem; font-weight: 700; color: #222; margin: 0; }
+.summary-card ion-card-content { padding: 16px; }
+.summary-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.95rem; color: #555; }
+.summary-sep { height: 1px; background: #eee; margin: 14px 0; }
+.summary-total { font-size: 1.1rem; color: #111; margin-bottom: 0; }
+.total-price { font-size: 1.3rem; font-weight: 800; color: var(--ion-color-primary); }
+
+/* Título de la pregunta */
+.payment-title {
+  text-align: center;
+  font-weight: 700;
+  color: #333;
+  margin: 10px 0 16px;
+  font-size: 1.15rem;
+  animation: fadeIn 0.4s ease;
+}
+
+/* NUEVOS BOTONES DE SELECCIÓN DE PAGO GIGANTES */
+.payment-selection-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.pay-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.pay-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f4f5f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: all 0.25s ease;
+}
+.pay-icon ion-icon { font-size: 28px; color: #666; }
+.pay-title { font-weight: 700; font-size: 1.05rem; color: #333; margin-bottom: 4px; text-align: center; }
+.pay-subtitle { font-size: 0.8rem; color: #888; text-align: center; }
+
+/* Estado Activo del Botón */
+.pay-card.active {
+  border-color: var(--ion-color-primary);
+  background: rgba(var(--ion-color-primary-rgb), 0.03);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.15);
+}
+.pay-card.active .pay-icon { background: var(--ion-color-primary); }
+.pay-card.active .pay-icon ion-icon { color: #ffffff; }
+.pay-card.active .pay-title { color: var(--ion-color-primary); }
+
+/* Animación para el cambio de vista */
+.fade-in { animation: fadeIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.payment-section { display: flex; flex-direction: column; gap: 16px; }
+
+/* --- BLOQUE PAGO ONLINE --- */
+.gpay-button {
+  width: 100%;
+  background: #ffffff;
+  color: #4caf50;
+  border: none;
+  border-radius: 30px;
+  padding: 14px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.gpay-button:active { transform: scale(0.98); }
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+.divider span { padding: 0 10px; }
+
+/* Formulario Tarjeta Realista */
+.credit-card-form {
+  background: #fff;
+  padding: 24px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row { display: flex; gap: 12px; }
+.input-field { display: flex; flex-direction: column; gap: 6px; }
+.input-field.half { flex: 1; }
+.input-field label { font-size: 0.8rem; font-weight: 600; color: #555; margin-left: 2px; }
+
+.input-field input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.input-field input:focus { border-color: var(--ion-color-primary); }
+
+/* --- ICONOS Y ESPACIOS DEL INPUT --- */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* IMPORTANTE: Más padding-left para que quepan los logos de los bancos sin pisar el texto */
+.input-wrapper .card-input { padding-left: 64px; } 
+.input-wrapper input[type="password"], 
+.input-wrapper input[type="tel"]:not(.card-input) {
+  padding-left: 12px;
+  padding-right: 36px;
+}
+
+/* Contenedor del Logo de Tarjeta */
+.brand-icon {
+  position: absolute;
+  left: 12px;
+  width: 44px; /* Un poco más ancho para logotipos largos como Santander o Caixabank */
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.field-icon-fallback {
+  font-size: 1.6rem;
+  color: #888;
+}
+
+/* Iconos de la derecha (CVV) */
+.field-icon.right {
+  position: absolute;
+  left: auto;
+  right: 12px;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* --- BLOQUE PAGO FÍSICO --- */
+.inperson-info {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+}
+.info-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 16px auto;
+}
+.inperson-info h3 { margin: 0 0 10px 0; color: #222; font-weight: 700; font-size: 1.2rem; }
+.inperson-info p { color: #555; font-size: 0.95rem; line-height: 1.4; margin: 0 0 8px 0; }
+.inperson-info .sub-text { font-size: 0.85rem; color: #888; }
+
+/* Botón Finalizar */
+.center-actions { margin-top: 10px; }
+.finalize-btn {
+  border-radius: 30px;
+  font-weight: 700;
+  --box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.25);
+  --padding-top: 18px;
+  --padding-bottom: 18px;
+}
+
+/* Success Overlay */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 20000;
+}
+.success-card {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.checkmark { width: 80px; height: 80px; }
+.checkmark__circle { stroke: #4caf50; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 164; stroke-dashoffset: 164; animation: circle 0.6s ease-out forwards; }
+.checkmark__check { stroke: #4caf50; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: check 0.45s 0.6s ease-out forwards; }
+.success-text { font-weight: 800; font-size: 1.2rem; color: #222; margin-top: 8px; }
+.success-sub { font-size: 0.9rem; color: #666; margin: 0; }
+
+@keyframes circle { to { stroke-dashoffset: 0; } }
+@keyframes check { to { stroke-dashoffset: 0; } }
+
+/* Estilo específico para el botón "Atrás" en la esquina inferior izquierda (coincide con tab3) */
+.bottom-left-button .back-button {
   min-width: 96px;
   border-radius: 24px;
   --background: #ffffff;
@@ -24,103 +321,21 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-/* Extra scrollable space at the end of the page to avoid overlap */
-.page-bottom-spacer {
-  height: calc(24px + env(safe-area-inset-bottom));
-  width: 100%;
-}
-
-/* Summary square card */
-.summary-card {
-  border-radius: 12px;
-  --background: #ffffff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 12px;
-  /* make card responsive and not force a square shape */
-  width: 100%;
-  max-width: 420px;
-  min-height: 180px;
-}
-.summary-line {
-  font-size: 14px;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.summary-line .label { flex: 1 1 auto; }
-.summary-line .value { flex: 0 0 auto; text-align: right; }
-
-/* Align info button inside summary card */
-.summary-actions { text-align: right; }
-.summary-actions ion-button { --padding-start: 0; --padding-end: 0; }
-.summary-sep { display:block; border: none; height: 1px; background: #e0e0e0; margin: 8px 0; }
-.summary-total { font-size: 16px; font-weight: 700 }
-
-/* Centering container to place the summary in the middle of the viewport */
-.center-container {
-  min-height: calc(100vh - 120px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 12px;
-  box-sizing: border-box;
-}
-
-.center-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 14px;
-  gap: 12px;
-  width: 100%;
-}
-
-.finalize-btn {
-  width: 220px;
-  border-radius: 28px;
-  font-weight: 700;
-  --box-shadow: 0 8px 20px rgba(46,125,50,0.12);
-}
-
-/* Payment options */
-.payment-options { width: 100%; display:flex; justify-content:center; }
-.payment-segment { max-width: 360px; width:100%; border-radius: 999px; overflow: hidden; }
-.payment-segment .segment-button { font-weight:600; }
-
-/* Success overlay styles and animation */
-.success-overlay {
+/* Override final para forzar exactamente el mismo formato que en tab2 */
+.bottom-left-button {
   position: fixed;
-  inset: 0;
-  display:flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.35);
-  z-index: 20000;
+  left: 16px;
+  /* place the button above the tab bar and respect safe-area-inset */
+  bottom: calc(15px + env(safe-area-inset-bottom));
+  z-index: 14000;
+  transform: translateY(0);
 }
-.success-card {
-  background: white;
-  padding: 28px 34px;
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-  display:flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.checkmark { width:86px; height:86px; }
-.checkmark__circle { stroke: #4caf50; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 164; stroke-dashoffset: 164; animation: circle 0.6s ease-out forwards; }
-.checkmark__check { stroke: #4caf50; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: check 0.45s 0.6s ease-out forwards; }
-.success-text { font-weight:700; color:#222; }
-
-@keyframes circle {
-  to { stroke-dashoffset: 0; }
-}
-@keyframes check {
-  to { stroke-dashoffset: 0; }
+.bottom-left-button ion-button {
+  min-width: 96px;
+  border-radius: 24px;
+  --background: #ffffff;
+  color: #2e7d32;
+  font-weight: 400;
+  --border-color: #2e7d32;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }

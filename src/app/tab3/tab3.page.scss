@@ -1,11 +1,320 @@
-/* Styles for tab3 */
+/* Variables generales */
 :host {
-  --ion-background-color: transparent;
+  --ion-background-color: #f4f5f8;
 }
 
+.bg-light {
+  --background: #f4f5f8;
+}
+
+.ion-padding {
+  padding-bottom: 20px;
+  padding-top: 10px;
+}
+
+/* Tarjetas base */
+.shadow-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
+  border: none;
+}
+
+ion-card-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.title-icon {
+  margin-right: 8px;
+  color: var(--ion-color-primary);
+  font-size: 1.4rem;
+}
+
+/* Card Habitacion Seleccionada */
+.selection-card {
+  border-radius: 16px;
+  padding: 12px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  margin-top: 0;
+}
+
+.selection-inner {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.room-thumb img {
+  width: 110px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.room-info {
+  flex: 1;
+}
+
+.room-title { font-weight: 800; font-size: 1.1rem; color: #111; }
+.room-sub { font-size: 0.85rem; color: #666; margin-top: 2px; }
+.room-meta { margin-top: 6px; font-size: 0.85rem; }
+.room-meta .price { font-weight: 700; color: var(--ion-color-primary); font-size: 1rem; margin-top: 4px;}
+.room-meta .old { text-decoration: line-through; color: #999; font-weight: 400; margin-left: 6px; font-size: 0.8rem; }
+.room-meta .extras { color: #555; margin-top: 2px; }
+
+.reservation {
+  min-width: 140px;
+  text-align: right;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 12px;
+}
+.res-title { font-weight: 700; font-size: 0.85rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px;}
+.res-dates { font-size: 0.9rem; font-weight: 600; margin-top: 4px; color: #111;}
+.res-meta { font-size: 0.8rem; color: #666; margin-top: 4px; }
+
+@media (max-width: 600px) {
+  .selection-inner { flex-direction: column; align-items: stretch; }
+  .reservation { text-align: left; background: transparent; padding: 0; border-top: 1px solid #eee; padding-top: 10px; margin-top: 5px;}
+  .room-thumb img { width: 100%; height: 140px; }
+}
+
+/* Pensiones */
+.transparent-list {
+  background: transparent;
+}
+.pension-item {
+  --background: transparent;
+  --border-color: #eee;
+}
+.pension-name {
+  font-weight: 600;
+  color: #333;
+}
+.pension-price {
+  color: var(--ion-color-primary);
+  font-weight: 800;
+}
+.pension-desc {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* Formularios de Pasajeros */
+.passengers-form-container {
+  margin-top: 10px;
+}
+
+.form-box {
+  background: #fdfdfd;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.form-box.primary-box {
+  border-color: var(--ion-color-primary);
+  background: rgba(var(--ion-color-primary-rgb), 0.02);
+}
+
+/* AJUSTES PARA EL HEADER Y EL BOTÓN "USAR MIS DATOS" */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.header-titles h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.use-data-btn {
+  margin: 0;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Grid del formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.input-group ion-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.input-group .req {
+  color: var(--ion-color-danger);
+}
+
+.input-group ion-input {
+  --background: #fff;
+  --padding-start: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.error-msg {
+  color: var(--ion-color-danger);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-header { flex-direction: column; align-items: flex-start; gap: 10px;}
+  .use-data-btn { align-self: flex-start; }
+}
+
+/* Resumen de pasajeros (Lista visual) */
+.passengers-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.summary-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.summary-icon.is-primary {
+  background: var(--ion-color-primary);
+  color: #fff;
+}
+
+.summary-info {
+  flex: 1;
+}
+
+.summary-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.summary-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.summary-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Botones flotantes abajo */
+.page-bottom-spacer {
+  height: calc(80px + env(safe-area-inset-bottom));
+}
+
+.bottom-left-button, .bottom-right-button {
+  position: fixed;
+  bottom: calc(10px);
+  z-index: 14000;
+}
+
+.bottom-left-button { left: 16px; }
+.bottom-right-button { 
+  right: 16px; 
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-right-button.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bottom-left-button ion-button, .bottom-right-button ion-button {
+  border-radius: 30px;
+  font-weight: 600;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Estilo específico para el botón "Atrás" en la esquina inferior izquierda */
+.bottom-left-button .back-button {
+  min-width: 96px;
+  border-radius: 24px;
+  --background: #ffffff;
+  color: #2e7d32;
+  --border-color: #2e7d32;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Override final para forzar exactamente el mismo formato que en tab2 */
 .bottom-left-button {
   position: fixed;
-  left: 12px;
+  left: 16px;
   /* place the button above the tab bar and respect safe-area-inset */
   bottom: calc(10px);
   z-index: 14000;
@@ -16,123 +325,7 @@
   border-radius: 24px;
   --background: #ffffff;
   color: #2e7d32;
+  font-weight: 400;
   --border-color: #2e7d32;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-/* small padding to avoid overlap with content */
-.ion-padding { padding-bottom: 72px; padding-top: 25px; }
-
-/* Compact selection card combining room + reservation */
-.selection-card {
-  border-radius: 12px;
-  padding: 8px;
-  --background: #ffffff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-}
-
-/* Reduce gap between selection card and pensions card */
-.selection-card { margin-bottom: -30px; }
-.pensions-card { margin-top: 0px; }
-.selection-inner {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.room-thumb img {
-  width: 96px;
-  height: 72px;
-  object-fit: cover;
-  border-radius: 8px;
-  display: block;
-}
-.room-info {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.room-title { font-weight: 700; font-size: 14px; }
-.room-sub { font-size: 12px; color: #4a4a4a; margin-top: 2px }
-.room-meta { margin-top: 6px; font-size: 12px; color: #333 }
-.room-meta .price { font-weight: 800; color: #111 }
-.room-meta .old { text-decoration: line-through; color: #999; font-weight: 400; margin-left: 6px; font-size: 12px }
-.room-meta .extras { color: #555; font-size: 12px; margin-top: 4px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
-
-@media (max-width: 560px) {
-  .room-meta .extras { white-space: normal; max-width: 100%; }
-}
-.reservation {
-  min-width: 160px;
-  text-align: right;
-}
-.res-title { font-weight: 700; font-size: 13px }
-.res-dates { font-size: 12px; margin-top: 4px }
-.res-meta { font-size: 12px; color: #4a4a4a; margin-top: 4px }
-.res-actions { margin-top: 6px }
-
-@media (max-width: 560px) {
-  .selection-inner { flex-direction: column; align-items: stretch; }
-  .reservation { text-align: left; }
-  .room-thumb img { width: 100%; height: 160px; }
-}
-
-/* Passengers form styles */
-.passengers-list { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
-.passengers-card { margin-bottom: 20px; }
-.passenger-form ion-card { --background: #fffefc; }
-.passenger-form ion-segment { width: 100%; margin-top: 6px; }
-.people-actions { margin-bottom: 8px; }
-.passengers-summary ion-card { margin-top: 10px; }
-.passengers-summary h3 { margin: 0 0 4px 0; font-size: 14px; }
-.passengers-summary p { margin: 0; color: #666; font-size: 13px; }
-.add-buttons { display:flex; gap:8px; flex-wrap:wrap; margin-top: 8px }
-.save-action { margin-top: 8px }
-.form-actions { margin-top: 8px; text-align: right }
-.empty-note { color: #666; font-size: 13px }
-
-/* Distinct styling for passenger edit button to differ from add buttons */
-.btn-edit {
-  --border-radius: 18px;
-  --padding-start: 8px;
-  --padding-end: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ion-color-primary-contrast, #2e7d32);
-  border: 1px solid rgba(46,125,50,0.12);
-}
-.btn-edit ion-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-
-/* Fixed bottom-right proceed button */
-.bottom-right-button {
-  position: fixed;
-  right: 12px;
-  /* place the button above the tab bar and respect safe-area-inset */
-  bottom: calc(10px);
-  z-index: 14000;
-  transform: translateY(0);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .22s ease, transform .22s ease;
-}
-.bottom-right-button.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-.bottom-right-button ion-button {
-  min-width: 96px;
-  border-radius: 24px;
-  --background: #2e7d32;
-  color: #ffffff;
-  --border-color: #2e7d32;
-  box-shadow: 0 6px 18px rgba(46,125,50,0.18);
-}
-
-/* Extra scrollable space at the end of the page to avoid overlap */
-.page-bottom-spacer {
-  height: calc(24px + env(safe-area-inset-bottom));
-  width: 100%;
 }
