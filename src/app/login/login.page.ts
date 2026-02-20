@@ -120,4 +120,15 @@ export class LoginPage implements OnInit {
       }, 6000);
     });
   }
+
+  // Variable para saber si el input está enfocado
+  isKeyboardOpen: boolean = false;
+
+  onInputFocus() {
+    this.isKeyboardOpen = true;
+  }
+
+  onInputBlur() {
+    this.isKeyboardOpen = false;
+  }
 }

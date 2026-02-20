@@ -1,749 +1,447 @@
 .tab1-content {
   padding-top: 0;
+  --background: #f8fafc; /* Fondo gris clarito elegante */
 }
 
-/* Estilos para el título de la barra: mismo estilo que los h1 */
-:host ::ng-deep ion-title {
-  color: #1b5e20 !important; /* verde */
-  font-weight: 700 !important; /* negrita */
-  font-size: 28px !important; /* más grande */
-  font-family: 'Lora', Georgia, 'Times New Roman', serif !important; /* misma fuente que h1 */
-  letter-spacing: 0.4px;
-}
-.top-area {
-  position: relative;
-  overflow: visible; /* allow popovers to extend outside on small screens */
+/* ==========================================================================
+   WIDGET DE RESERVAS (ESTILO PREMIUM)
+   ========================================================================== */
+:host ::ng-deep ion-title { 
+  color: #1b5e20 !important; 
+  font-weight: 700 !important; 
+  font-size: 28px !important; 
+  font-family: 'Lora', Georgia, serif !important; 
+  letter-spacing: 0.4px; 
 }
 
-/* Background image removed per user request. */
+.top-area { position: relative; overflow: visible; }
 
-.header-box {
-  width: 78%;
-  max-width: 760px;
-  height: auto;
-  background: linear-gradient(180deg,#1b5e20,#66bb6a);
-  margin: 18px auto 16px;
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.header-box .reservation {
-  display: none;
-}
-.header-box .reservation h3 {
-  display: none;
-}
-.header-box .reservation-inner {
-  display: none;
-}
-.header-box .datetime-item {
-  display: none;
-}
-.header-box ion-icon {
-  color: #1b5e20;
-  font-size: 20px;
-  margin-right: 6px;
-}
-.compact-datetime {
-  width: 100%;
-  --padding-start: 6px;
-  --padding-end: 6px;
-  --color: #073818;
-  --background: transparent;
-  font-size: 14px;
-}
-.header-box .chosen-date {
-  display: none;
+/* Contenedor principal verde (más elegante y redondeado) */
+.header-box { 
+  width: 78%; 
+  max-width: 760px; 
+  height: auto; 
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); 
+  margin: 18px auto 16px; 
+  border-radius: 20px; 
+  box-shadow: 0 12px 32px rgba(27,94,32,0.15); 
+  padding: 14px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  position: relative; 
+  z-index: 30;
 }
 
-/* New booking widget styles */
-.booking-widget {
-  width: 100%;
-  max-width: 720px;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 6px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.header-box .reservation, .header-box .reservation h3, .header-box .reservation-inner, .header-box .datetime-item, .header-box .chosen-date { display: none; }
+.header-box ion-icon { color: #1b5e20; font-size: 20px; margin-right: 6px; }
+.compact-datetime { width: 100%; --padding-start: 6px; --padding-end: 6px; --color: #073818; --background: transparent; font-size: 14px; }
+
+/* El widget blanco de reservas */
+.booking-widget { 
+  width: 100%; 
+  max-width: 720px; 
+  background: #ffffff; 
+  border-radius: 16px; 
+  padding: 12px; 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  position: relative; 
+  z-index: 40;
 }
-.booking-widget .dates-row {
-  display: flex;
-  gap: 8px;
+
+.booking-widget .dates-row, .dates-top { display: flex; gap: 10px; }
+
+/* Botones de fecha y selectores pequeños (Estilo limpio gris-blanco) */
+.date-pill, .small-box { 
+  flex: 1 1 0; 
+  background: #f8fafc; 
+  border-radius: 12px; 
+  padding: 12px 14px; 
+  cursor: pointer; 
+  border: 1px solid #e2e8f0; 
+  position: relative; 
+  transition: all 0.2s ease;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
 }
-.dates-top, .booking-widget .dates-row {
-  display: flex;
-  gap: 8px;
+
+.date-pill:hover, .small-box:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
-.date-pill {
-  flex: 1 1 0;
-  background: #fff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
-  cursor: pointer;
-  border: 1px solid rgba(0,0,0,0.06);
-  position: relative;
+
+/* Etiquetas (Adultos, Fecha...) */
+.pill-label, .small-box .box-label { 
+  font-size: 11px; 
+  color: #64748b; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+  font-weight: 700; 
 }
-.date-pill + .date-pill { margin-left: 6px; }
-.pill-label { font-size: 12px; color: #666; }
-.pill-date { font-weight: 800; color: #111; margin-top: 4px; }
+
+/* Valores (20 feb 2026, 2...) */
+.pill-date, .small-box .box-value { 
+  font-weight: 800; 
+  color: #1e293b; 
+  margin-top: 4px; 
+  font-size: 15px; 
+}
+
 .picker-hidden { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
-.date-pill.open {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.09);
-  border-color: rgba(0,0,0,0.08);
+/* Estado activo/abierto */
+.date-pill.open { 
+  background: #ffffff;
+  border-color: #1b5e20; 
+  box-shadow: 0 4px 16px rgba(27,94,32,0.08); 
 }
-.date-pill.open::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 22px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid #ffffff;
-}
-.booking-widget .date-item {
-  --background: transparent;
-  flex: 1 1 0;
-  border-radius: 8px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.booking-widget .date-item ion-datetime {
-  --padding-start: 6px;
-  --padding-end: 6px;
-}
-.booking-widget .date-display { font-weight: 700; color: #222; font-size: 14px; }
-.booking-widget .picks-row { display: flex; gap: 8px; }
-.booking-widget .small-select { flex: 1 1 0; --background: transparent; padding: 6px; border-radius: 8px; }
-.picks-row { display: flex; gap: 8px; }
-.small-box { flex: 1 1 0; background: #fff; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.06); cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: center; }
-.small-box .box-label { font-size: 12px; color: #666; }
-.small-box .box-value { font-weight: 800; font-size: 15px; margin-top: 3px; color: #111; }
-.small-box::after { content: '\25BE'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #444; font-size: 13px; }
 
-/* keep ion-select hidden visuals but accessible only in compact mode (we still want interactive selects in expanded panel) */
+.booking-widget .date-item { --background: transparent; flex: 1 1 0; border-radius: 12px; padding: 6px 8px; display: flex; align-items: center; justify-content: space-between; }
+.booking-widget .date-item ion-datetime { --padding-start: 6px; --padding-end: 6px; }
+.booking-widget .date-display { font-weight: 700; color: #1e293b; font-size: 14px; }
+.booking-widget .picks-row, .picks-row { display: flex; gap: 10px; }
+.booking-widget .small-select { flex: 1 1 0; --background: transparent; padding: 6px; border-radius: 12px; }
+
+.small-box::after { content: '\25BE'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 14px; }
 .compact-picks .small-box ion-select { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
-.booking-widget .pets-row {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 12px 14px;
-  border: 2px solid #1b5e20; /* green border */
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+
+/* Sección Mascotas (Sin borde duro, más limpia) */
+.booking-widget .pets-row, .pets-row, .small-box.pets-row { 
+  background: #f8fafc; 
+  border-radius: 12px; 
+  padding: 14px 16px; 
+  border: 1px solid #e2e8f0; 
+  box-shadow: none; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
 }
-/* Pets card: neat, elevated container matching app theme */
-.pets-row {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 12px 14px;
-  border: 2px solid #1b5e20; /* green border */
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+
+.pets-row .pets-top, .small-box.pets-row .pets-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pets-row .box-label { font-size: 14px; font-weight: 700; color: #1e293b; text-transform: none; letter-spacing: 0;}
+
+/* Toggle de mascotas */
+.pets-row ion-toggle, .small-box.pets-row ion-toggle { 
+  --handle-background: #ffffff; 
+  --background: #cbd5e1; 
+  --handle-background-checked: #ffffff; 
+  --background-checked: #1b5e20; 
+  width: 50px; 
+  height: 28px; 
 }
-.pets-row .pets-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.pets-row .box-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: #111; /* ensure label text is black */
-}
-.pets-row ion-toggle {
-  --handle-background: #ffffff;
-  --background: #e6efe6; /* very light green track */
-  --handle-background-checked: #ffffff;
-  --background-checked: #1b5e20; /* green when checked */
-  --checked-background: #1b5e20;
-  --color: #1b5e20;
-  width: 56px;
-  height: 28px;
-}
-.pets-row ion-toggle::part(handle) {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-.pets-row .pets-info {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #111 !important; /* ensure note text is black */
-  line-height: 1.3;
-}
-.pets-row .pets-link {
-  display: inline-block;
-  margin-top: 6px;
-  color: #1b5e20 !important; /* green link */
-  font-size: 12px;
-  text-decoration: underline;
-}
-.pets-row .muted {
-  color: #333333 !important;
-  font-style: normal !important;
-  font-size: 13px;
-}
+.pets-row ion-toggle::part(handle) { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pets-row .pets-info, .small-box.pets-row .pets-info { margin-top: 4px; font-size: 12px; color: #64748b !important; line-height: 1.4; }
+.pets-row .pets-link, .pets-row a, .small-box.pets-row a { display: inline-block; margin-top: 6px; color: #1b5e20 !important; font-size: 12px; text-decoration: underline; font-weight: 600; }
+.pets-row .muted { color: #64748b !important; font-style: italic !important; font-size: 12px; }
 .small-box.pets-row::after { content: none !important; }
-.small-box.pets-row { /* ensure small-box wrapper gets the pets styling */
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 10px 12px;
-  border: 2px solid #1b5e20;
-  box-shadow: none;
-}
-.small-box.pets-row .pets-top { display:flex; align-items:center; justify-content:space-between; }
-.small-box.pets-row .pets-info {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #111 !important;
-}
 
-/* Force links and toggle colors to green inside pets card (override platform defaults) */
-.pets-row a, .small-box.pets-row a, .pets-row .pets-link {
-  color: #1b5e20 !important;
+/* Botón BUSCAR */
+.booking-widget .bottom-row, .bottom-row { display: flex; gap: 10px; flex-direction: column; }
+.booking-widget .search-btn, .search-btn { margin-top: 4px; }
+.big-green { 
+  background: #1b5e20; 
+  color: #fff !important; 
+  border-radius: 12px; 
+  height: 50px;
+  font-size: 15px;
+  font-weight: 700; 
+  letter-spacing: 1px;
+  --box-shadow: 0 6px 16px rgba(27,94,32,0.25); 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.pets-row ion-toggle, .small-box.pets-row ion-toggle {
-  --background: #e6efe6;
-  --background-checked: #1b5e20;
-  --checked-background: #1b5e20;
-  --handle-background: #ffffff;
-  --handle-background-checked: #ffffff;
-  --color: #1b5e20;
-}
-/* Extra, higher-specificity overrides to ensure the toggle uses green inside the pets card
-   (covers shadow DOM parts and Ionic color variables that may still apply) */
-.pets-row, .small-box.pets-row {
-  --ion-color-primary: #1b5e20 !important;
-  --ion-color-primary-rgb: 27,94,32 !important;
-}
-.pets-row ion-toggle::part(track), .small-box.pets-row ion-toggle::part(track) {
-  background: #e6efe6 !important;
-}
-/* checked track */
-.pets-row ion-toggle[aria-checked="true"]::part(track),
-.small-box.pets-row ion-toggle[aria-checked="true"]::part(track) {
-  background: #1b5e20 !important;
-}
-.pets-row ion-toggle::part(handle), .small-box.pets-row ion-toggle::part(handle) {
-  background: #ffffff !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
-}
-.booking-widget .bottom-row { display: flex; gap: 8px; flex-direction: column; }
-.booking-widget .search-btn { --padding-top: 10px; --padding-bottom: 10px; font-weight: 700; }
-.bottom-row { display: flex; gap: 8px; flex-direction: column; }
-.search-btn { --padding-top: 10px; --padding-bottom: 10px; font-weight: 700; }
-.big-green { background: #1b5e20; color: #fff !important; border-radius: 8px; --box-shadow: none; }
+.big-green:active { transform: scale(0.98); --box-shadow: 0 2px 8px rgba(27,94,32,0.15); }
 
-/* make the outer header green to match new theme */
-.header-box { background: linear-gradient(180deg,#1b5e20,#66bb6a); position: relative; z-index: 30; }
-
-/* ensure widget and popovers sit above the wave and nearby elements */
-.booking-widget { position: relative; z-index: 40; }
-
-/* boost popover overlays if necessary */
-:host ::ng-deep .popover-content, :host ::ng-deep ion-popover {
-  z-index: 9999 !important;
-}
-
-/* expanded inline panel for mobile calendars */
-.expanded-panel {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.expanded-calendar {
-  background: transparent;
-  display: flex;
-  gap: 8px;
-  flex-direction: column;
-}
-.expanded-calendar ion-datetime {
-  width: 100%;
-}
-
-/* custom calendar styles */
+/* Calendario extendido */
+:host ::ng-deep .popover-content, :host ::ng-deep ion-popover { z-index: 9999 !important; }
+.expanded-panel { background: #ffffff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 16px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #e2e8f0;}
+.expanded-calendar { background: transparent; display: flex; gap: 8px; flex-direction: column; }
+.expanded-calendar ion-datetime { width: 100%; }
 .custom-calendar { width: 100%; }
 .cal-header { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; }
-.cal-title { font-weight:700; }
-.cal-nav { background:transparent; border:none; font-size:20px; padding:6px 8px; }
+.cal-title { font-weight:700; color: #1e293b; font-size: 15px;}
+.cal-nav { background:transparent; border:none; font-size:24px; padding:4px 12px; color: #64748b; cursor: pointer; }
+.cal-nav:hover { color: #1b5e20; }
 .cal-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; padding:6px 6px; }
-.cal-weekday { font-size:12px; text-align:center; color:#666; }
-.cal-day { min-height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:transparent; font-size:13px; }
+.cal-weekday { font-size:12px; text-align:center; color:#94a3b8; font-weight: 600; }
+.cal-day { min-height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:transparent; font-size:14px; color: #475569;}
 .cal-day.empty { cursor:default; background:transparent; }
 .cal-day span { font-weight:600; }
-.cal-day.in-range { background: #e8f7ee; color: #0b4f2a; }
-.cal-day.start { background: #063b20; color: #fff; border-radius:6px 0 0 6px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.08); }
-.cal-day.end { background: #063b20; color: #fff; border-radius:0 6px 6px 0; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.08); }
-.cal-day.in-range.start { background:#d8efe0; }
-.cal-day.in-range.end { background:#d8efe0; }
+.cal-day:hover:not(.empty) { background: #f1f5f9; }
+.cal-day.in-range { background: #dcfce7; color: #166534; }
+.cal-day.start { background: #1b5e20; color: #fff; border-radius:8px 0 0 8px; }
+.cal-day.end { background: #1b5e20; color: #fff; border-radius:0 8px 8px 0; }
+.cal-day.in-range.start, .cal-day.in-range.end { background: #1b5e20; color: #fff; }
 
-/* range-strip removed — range highlighting is handled inside the calendar cells */
+/* Ola decorativa */
+.green-line { width: 100vw; height: 40px; margin-top: 6px; position: relative; left: 50%; transform: translateX(-50%); overflow: hidden; background: transparent; }
+.green-wave { width: 200%; height: 100%; display: block; }
+.green-wave.top { transform: translateX(0); animation: waveAnim 6s linear infinite; }
+@keyframes waveAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
+/* Cabecera de Usuario */
+.user-area { display: flex; align-items: center; gap: 8px; }
+.user-pill { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.95); padding: 4px 8px; border-radius: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.04); cursor: pointer;}
+.user-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#66bb6a,#1b5e20); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+.user-name { font-weight: 600; color: #1e293b; font-size: 14px; white-space: nowrap; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Responsive */
 @media (max-width: 720px) {
-  /* Keep date pills side-by-side on narrow tablets/large phones; allow wrapping if needed */
   .booking-widget .dates-row { flex-direction: row; flex-wrap: wrap; }
   .booking-widget .picks-row { flex-direction: column; }
-
-  /* Ensure the top date pills also stay side-by-side and take 50% width each */
-  .dates-top { display: flex; flex-wrap: nowrap; gap: 8px; }
-  .dates-top .date-pill { flex: 0 0 calc(50% - 6px); max-width: calc(50% - 6px); margin-left: 0; }
+  .dates-top { display: flex; flex-wrap: nowrap; gap: 10px; }
+  .dates-top .date-pill { flex: 0 0 calc(50% - 5px); max-width: calc(50% - 5px); margin-left: 0; }
 }
-
-/* Mobile-specific adjustments to make the header-box fit nicely */
 @media (max-width: 420px) {
-  .header-box {
-    width: calc(100% - 16px);
-    max-width: none;
-    margin: 12px auto 8px; /* reduce gap under header on small screens */
-    padding: 12px 10px;
-    border-radius: 10px;
-    height: auto; /* allow it to expand with the inline panel */
-  }
-
-  .booking-widget {
-    max-width: 100%;
-    padding: 8px;
-    gap: 6px;
-  }
-
-  /* make pills take full width or half width depending on available space */
-  .dates-top { flex-wrap: wrap; }
-  .date-pill { flex-basis: calc(50% - 6px); }
-
+  .header-box { width: calc(100% - 20px); max-width: none; margin: 12px auto 8px; padding: 12px; border-radius: 16px; height: auto; }
+  .booking-widget { max-width: 100%; padding: 10px; gap: 8px; width: 100%; border-radius: 12px;}
+  .dates-top { flex-wrap: wrap; gap: 8px;}
+  .date-pill { flex-basis: calc(50% - 4px); padding: 10px; }
   .booking-widget .date-display { font-size: 13px; }
-  .booking-widget .date-item { padding: 6px 6px; }
-
-  .booking-widget .picks-row { gap: 6px; }
+  .booking-widget .date-item { padding: 6px; }
+  .booking-widget .picks-row, .booking-widget .bottom-row { gap: 8px; }
   .small-box { padding: 10px; }
-
-  .booking-widget .bottom-row { gap: 6px; }
-  .booking-widget .search-btn { width: 100%; --padding-top: 12px; --padding-bottom: 12px; }
-
-  /* Ensure pickers don't overflow horizontally */
-  .booking-widget ion-datetime,
-  .booking-widget ion-select {
-    min-width: 0;
-    width: 100%;
-  }
-
-  /* ensure booking widget expands to fill header-box */
-  .booking-widget { width: 100%; }
-
-  /* Make toggle align nicely */
-  .booking-widget .pets-row {
-    /* keep green border and white background on small screens */
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 8px 10px;
-    border: 2px solid #1b5e20;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
+  .booking-widget .search-btn { width: 100%; }
+  .booking-widget ion-datetime, .booking-widget ion-select { min-width: 0; width: 100%; }
 }
 
-@media (max-width: 420px) {
-  .header-box { height: auto; padding: 12px; margin-top: 12px; }
-  .header-box .reservation-inner { flex-direction: column; align-items: stretch; }
-  .header-box .reservation-inner ion-button { width: 100%; }
-}
-
-.header-box .reservation {
-  padding: 12px 16px;
-  color: #083712;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-/* User pill in header */
-.user-area {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.95);
-  padding: 4px 8px;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.04);
-}
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg,#66bb6a,#1b5e20);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-}
-.user-name {
-  font-weight: 600;
-  color: #083712;
-  font-size: 14px;
-  white-space: nowrap;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.header-box .reservation h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-.header-box ion-item {
-  --background: transparent;
-  width: 100%;
-  padding: 0;
-}
-.header-box .reservation-actions {
-  display: flex;
-  gap: 8px;
-}
-.header-box .chosen-date {
-  margin-top: 6px;
-  font-size: 13px;
-  color: rgba(4,64,22,0.9);
-}
-
-/* Línea verde situada justo debajo del rectángulo principal */
-.green-line {
-  width: 100vw; /* full viewport width */
-  height: 40px; /* fit single wave */
-  margin-top: 6px;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  overflow: hidden;
-  background: transparent;
-}
-
-/* Base SVG wave sizing */
-.green-wave {
-  width: 200%;
-  height: 100%;
-  display: block;
-}
-
-/* Top wave (above the line) */
-.green-wave.top {
-  transform: translateX(0);
-  animation: waveAnim 6s linear infinite;
-}
-
-@keyframes waveAnim {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.section-title {
-  /* fuente: Lora */
-  font-family: 'Lora', Georgia, 'Times New Roman', serif;
-  display: block;
-  text-align: center;
-  margin: 16px auto 12px;
-  font-size: 36px;
-  font-weight: 600;
-  color: #184f23;
-  background: linear-gradient(90deg, rgba(76,175,80,0.08), rgba(129,199,132,0.02));
-  padding: 6px 16px;
-  border-radius: 999px;
-  box-shadow: 0 8px 20px rgba(30,120,50,0.06);
-  border: 1px solid rgba(67,160,71,0.1);
-  letter-spacing: 0.6px;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-.section-title:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(30,120,50,0.10);
-}
-
-@media (max-width: 420px) {
-  .section-title {
-    font-size: 22px;
-    padding: 6px 10px;
-  }
-}
-
-/* cargar Lora desde Google Fonts */
+/* ==========================================================================
+   NUEVOS ESTILOS PREMIUM (Títulos, Álbumes, Opiniones, Contacto)
+   ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&display=swap');
 
-.image-card {
-  width: 95%;
-  max-width: 900px;
-  height: 320px;
-  margin: 4px auto 8px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: none;
-  background: #fff;
+.premium-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 10px 40px;
 }
 
-.image-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Títulos Elegantes */
+.section-title {
+  font-family: 'Lora', Georgia, serif;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1b5e20;
+  margin: 40px 0 24px;
+  position: relative;
   display: block;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: #43a047;
+    border-radius: 4px;
+  }
 }
 
-/* Album / carousel styles: horizontal swipe with snap */
-.album-container {
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  padding: 8px 0 12px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-.album-container::-webkit-scrollbar{
-  display: none;
-}
-.album-item {
-  flex: 0 0 100%;
-  max-width: 100%;
-  scroll-snap-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-/* Ensure image-card inside album fills the slide */
-.album-container .image-card {
-  width: 100%;
-  max-width: none;
-  height: 250px;
-  max-height: none;
-  margin: 0;
-  border-radius: 12px;
-  overflow: hidden;
+@media (max-width: 420px) {
+  .section-title { font-size: 26px; }
 }
 
-/* Ensure album images do not get cropped */
-.album-container .image-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  display: block;
-}
-
-/* images start slightly shifted and slide into place when their slide becomes active */
-.album-item .image-card img {
-  transition: transform 1100ms cubic-bezier(.22,.61,.36,1), opacity 900ms ease;
-  transform: translateX(6%);
-  opacity: 0.98;
-}
-.album-item.active .image-card img {
-  transform: translateX(0);
-  opacity: 1;
-}
-.album-item.active .image-card {
-  box-shadow: none;
-}
-
-/* Onda eliminada: estilos removidos */
-
-/* Miniaturas cuadradas: usar aspect-ratio para mantener 1:1 y object-fit para recorte */
-.thumb-100x50 {
-  width: 240px;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  border-radius: 12px;
-  display: block;
-  line-height: 0;
-  background: #eee;
-}
-
-.thumb-100x50 img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  display: block;
-}
-
-/* Wrapper and buttons for album navigation */
+/* Álbumes (Carrusel) */
 .album-wrapper {
   position: relative;
+  margin-bottom: 20px;
+}
+
+.album-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 10px 4px 24px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.album-item {
+  flex: 0 0 90%;
+  max-width: 800px;
+  scroll-snap-align: center;
+}
+
+@media (min-width: 768px) {
+  .album-item { flex: 0 0 100%; } /* En PC/Tablet grande, que ocupe todo */
+}
+
+.image-card {
+  width: 100%;
+  height: 300px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  background: #fff;
+  transition: transform 0.3s ease;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+  }
+  
+  &:hover img { transform: scale(1.03); }
 }
 
 .album-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 30;
-  background: rgba(0,0,0,0.45);
-  color: #fff;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1b5e20;
   border: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  line-height: 1;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover { background: #fff; transform: translateY(-50%) scale(1.05); }
+  &.prev { left: -10px; }
+  &.next { right: -10px; }
 }
 
-.album-btn.prev { left: 12px; }
-.album-btn.next { right: 12px; }
-
-.album-btn:focus { outline: 2px solid rgba(255,255,255,0.9); }
-.album-btn:active { transform: translateY(-50%) scale(0.98); }
-
-/* Opiniones (sección verde) */
+/* Opiniones (Tarjetas Modernas) */
 .opinions-section {
-  margin: 20px auto 36px;
-  max-width: 980px;
-  background: #e8f5e9; /* muy claro */
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(46,125,50,0.08);
-  padding: 18px;
-  border: 1px solid rgba(67,160,71,0.08);
-}
-.opinions-section .section-subtitle {
-  margin: 0 0 12px;
-  font-size: 22px;
-  text-align: left;
-  color: #2e7d32;
-  font-weight: 600;
-  font-family: 'Lora', Georgia, 'Times New Roman', serif;
-}
-.opinions-section ion-list {
-  margin-bottom: 12px;
-  background: transparent;
-}
-.opinions-section ion-item {
-  --inner-padding-end: 8px;
-  --inner-padding-start: 8px;
-  border-radius: 10px;
-  background: rgba(76,175,80,0.06);
-  margin: 6px 0;
-}
-.opinions-section ion-avatar img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 50%;
-  background: #c8e6c9;
-}
-.opinions-section .rating {
-  color: #2e7d32;
-  font-weight: 700;
-  margin-left: 8px;
-}
-.opinions-section .comment-text {
-  margin: 6px 0 0;
-  color: #224422;
-}
-.opinions-section .comment-date {
-  margin-top: 6px;
-  font-size: 12px;
-  color: rgba(34,68,34,0.7);
-}
-.opinions-section .muted {
-  color: rgba(34,68,34,0.6);
-  font-style: italic;
-}
-.opinions-section .new-comment-form ion-item {
-  background: rgba(255,255,255,0.96);
-  border-radius: 8px;
-  margin: 8px 0;
-}
-.opinions-section .form-actions {
-  margin-top: 10px;
-}
-.opinions-section ion-button {
-  --background: #43a047;
-  --background-activated: #2e7d32;
-  --color: #fff;
+  margin-top: 50px;
 }
 
-/* Make only the "Enviar opinión" button use white bold text */
-.opinions-section .new-comment-form .form-actions ion-button {
-  --color: #fff;
-  font-weight: 700;
+.reviews-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 30px;
 }
 
-/* Strong override: ensure the submit button text is white and bold */
-.opinions-section .new-comment-form .form-actions ion-button[type="submit"],
-.opinions-section .new-comment-form .form-actions ion-button {
-  --color: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
+@media (min-width: 768px) {
+  .reviews-grid { grid-template-columns: 1fr 1fr; }
 }
 
-/* Small responsive tweaks */
-@media (max-width: 420px) {
-  .opinions-section { padding: 12px; }
-  .thumb-100x50 { width: 100%; aspect-ratio: 1 / 1; }
+.review-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(27, 94, 32, 0.04);
+  border: 1px solid #edf2f7;
+  
+  .review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    background: #e2e8f0;
+  }
+  
+  .review-meta {
+    flex: 1;
+    h3 { margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; }
+    .comment-date { font-size: 12px; color: #94a3b8; }
+  }
+  
+  .review-rating { color: #f59e0b; font-size: 14px; letter-spacing: 2px; }
+  .comment-text { color: #475569; font-size: 14px; line-height: 1.6; margin: 0; font-style: italic; }
 }
 
-/* Cuadro de contacto debajo de opiniones */
-.contact-card {
-  margin: 14px auto 40px;
-  max-width: 920px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #e8f5e9, #f8fff9);
-  box-shadow: 0 8px 20px rgba(46,125,50,0.06);
-  border: 1px solid rgba(46,125,50,0.08);
-  padding: 10px;
-}
-.contact-card .section-subtitle {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #1b5e20;
-  font-weight: 700;
-}
-.contact-card ion-card {
-  background: linear-gradient(180deg, #f1fff6, #ffffff);
-  border-radius: 8px;
-  box-shadow: none;
-}
-.contact-card ion-item {
-  margin: 4px 0;
-  border-radius: 6px;
-  background: transparent;
-  padding: 6px 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.contact-card .contact-value {
-  color: #145a32;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: right;
+/* Formulario de Nueva Opinión */
+.leave-review-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(27, 94, 32, 0.06);
+  
+  h3 { margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1b5e20; text-align: center; }
+  
+  .custom-input {
+    --background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    --padding-start: 16px;
+  }
+  
+  .rating-select {
+    --background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+    --padding-start: 16px;
+    ion-label { color: #64748b; font-weight: 600; }
+  }
+  
+  .submit-btn {
+    --background: #1b5e20;
+    --background-hover: #145a32;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    height: 50px;
+  }
 }
 
-@media (max-width: 420px) {
-  .contact-card { padding: 10px; }
+/* Contacto (Grid con Iconos) */
+.contact-section {
+  margin-top: 60px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .contact-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.contact-item {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  border: 1px solid #edf2f7;
+  transition: transform 0.2s;
+  
+  &:hover { transform: translateY(-4px); }
+  
+  .icon-circle {
+    width: 60px;
+    height: 60px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    
+    ion-icon { font-size: 28px; color: #1b5e20; }
+  }
+  
+  h4 { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #1e293b; }
+  p { margin: 0; color: #64748b; font-size: 14px; }
 }

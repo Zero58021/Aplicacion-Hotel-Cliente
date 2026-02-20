@@ -18,21 +18,37 @@
   .shape {
     position: absolute;
     border-radius: 50%;
-    opacity: 0.22;
-    filter: blur(28px);
+    opacity: 0.35; /* Transparencia suave para que no molesten a la vista */
+    filter: blur(35px); /* Un blur un poco mayor para que parezcan manchas difuminadas */
     transform: translate3d(0,0,0);
-    animation: float 8s ease-in-out infinite;
   }
 
-  .s1 { width: 260px; height: 260px; background: #16a34a; left: -40px; top: -40px; }
-  .s2 { width: 180px; height: 180px; background: #10b981; right: -40px; top: 30%; animation-duration: 10s; }
-  .s3 { width: 140px; height: 140px; background: #34d399; left: 10%; bottom: -60px; animation-duration: 12s; }
+  /* Distribuimos las manchas por toda la pantalla con distintos tonos de verde */
+  .s1 { width: 260px; height: 260px; background: #16a34a; left: -40px; top: -40px; animation: float-1 12s ease-in-out infinite; }
+  .s2 { width: 200px; height: 200px; background: #10b981; right: -50px; top: 20%; animation: float-2 15s ease-in-out infinite reverse; }
+  .s3 { width: 160px; height: 160px; background: #34d399; left: 15%; bottom: -40px; animation: float-3 10s ease-in-out infinite; }
+  .s4 { width: 180px; height: 180px; background: #059669; right: 10%; bottom: 10%; animation: float-1 14s ease-in-out infinite reverse; }
+  .s5 { width: 140px; height: 140px; background: #6ee7b7; left: -20px; top: 40%; animation: float-2 18s ease-in-out infinite; }
+  .s6 { width: 220px; height: 220px; background: #10b981; right: 30%; top: -80px; animation: float-3 16s ease-in-out infinite reverse; }
+  .s7 { width: 120px; height: 120px; background: #34d399; left: 40%; top: 30%; animation: float-1 20s ease-in-out infinite; opacity: 0.15; }
 }
 
-@keyframes float {
-  0% { transform: translateY(0) translateX(0) rotate(0deg); }
-  50% { transform: translateY(-18px) translateX(8px) rotate(12deg); }
-  100% { transform: translateY(0) translateX(0) rotate(0deg); }
+/* Creamos 3 patrones de movimiento distintos para que parezca orgánico */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-50px, -30px) scale(0.95); }
+  66% { transform: translate(30px, -40px) scale(1.05); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 60px) scale(1.15); }
 }
 
 .login-container {
@@ -44,6 +60,11 @@
   padding: 20px;
   position: relative;
   z-index: 1;
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
+  &.keyboard-up {
+    transform: translateY(-80px); /* Ajusta este valor si necesitas que suba más o menos */
+  }
 }
 
 .header {

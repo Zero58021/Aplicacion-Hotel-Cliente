@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true" class="login-content" [class.party-active]="isPartyMode">
+<ion-content [fullscreen]="true" class="login-content" [scrollY]="false" [class.party-active]="isPartyMode">
   
   <div class="disco-overlay" *ngIf="isPartyMode"></div>
 
@@ -6,9 +6,13 @@
     <span class="shape s1"></span>
     <span class="shape s2"></span>
     <span class="shape s3"></span>
+    <span class="shape s4"></span>
+    <span class="shape s5"></span>
+    <span class="shape s6"></span>
+    <span class="shape s7"></span>
   </div>
 
-  <div class="login-container">
+  <div class="login-container" [class.keyboard-up]="isKeyboardOpen">
 
     <div class="header">
       <div class="logo-wrap" (click)="onLogoClick()">
@@ -23,12 +27,14 @@
 
         <ion-item lines="none" class="input-item" tabindex="0">
           <ion-icon slot="start" name="person-outline"></ion-icon>
-          <ion-input [(ngModel)]="loginUser" placeholder="Usuario (ej: isaac)" type="text"></ion-input>
+          <ion-input [(ngModel)]="loginUser" placeholder="Usuario (ej: isaac)" type="text" 
+                     (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()"></ion-input>
         </ion-item>
 
         <ion-item lines="none" class="input-item" tabindex="0">
           <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
-          <ion-input [(ngModel)]="loginPass" placeholder="Contraseña" [type]="showPassword ? 'text' : 'password'"></ion-input>
+          <ion-input [(ngModel)]="loginPass" placeholder="Contraseña" [type]="showPassword ? 'text' : 'password'"
+                     (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()"></ion-input>
           <ion-button slot="end" fill="clear" class="eye-btn" (click)="togglePassword()" aria-label="Mostrar contraseña">
             <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
           </ion-button>

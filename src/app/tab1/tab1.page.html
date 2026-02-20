@@ -16,7 +16,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding tab1-content">
-  <!-- Top area: rounded box and wave divider -->
   <div class="top-area">
     <div class="header-box">
       <div class="booking-widget booking-widget-photo">
@@ -33,7 +32,6 @@
             <ion-datetime #checkoutPicker class="picker-hidden" presentation="date" interface="popover" [(ngModel)]="checkoutDate" (ionChange)="onDatesChange(); closePickers()" (ionCancel)="closePickers()" name="checkout"></ion-datetime>
           </div>
         </div>
-        <!-- if a picker is active, show an expanded inline panel with calendar + selects to avoid popover clipping on mobile -->
         <ng-container *ngIf="activePicker; else compactPicks">
           <div class="expanded-panel">
             <div class="expanded-calendar">
@@ -133,7 +131,6 @@
               </div>
               <div class="pets-info">
                 <div class="muted">Los animales de servicio no se consideran mascotas.</div>
-                
               </div>
             </div>
           </div>
@@ -142,164 +139,113 @@
         </ng-template>
       </div>
     </div>
-    <!-- Línea verde con ola animada debajo del rectángulo -->
     <div class="green-line" aria-hidden="true">
-      <!-- top wave only -->
       <svg class="green-wave top" viewBox="0 0 2400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M0,40 C150,80 350,0 600,40 C750,60 900,20 1200,40 C1350,60 1500,20 1800,40 C1950,60 2100,20 2400,40 L2400,80 L0,80 Z" fill="#2e7d32"></path>
       </svg>
     </div>
   </div>
 
-  <!-- Onda eliminada -->
+  <div class="premium-container">
+    
+    <h2 class="section-title">Conócenos</h2>
+    <div class="album-wrapper">
+      <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior">‹</button>
+      <div class="album-container" #albumContainer>
+        <div class="album-item" *ngFor="let img of ['1.webp', '2.jpg', '3.jpg', '4.jpg']">
+          <div class="image-card">
+            <img [src]="'assets/fotosInicio/' + img" alt="Instalaciones" (click)="openPhoto('assets/fotosInicio/' + img)" />
+          </div>
+        </div>
+      </div>
+      <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente">›</button>
+    </div>
 
-  <!-- Section title -->
-  <h1 class="section-title">CONOCENOS</h1>
+    <h2 class="section-title">Nuestras Instalaciones</h2>
+    <div class="album-wrapper">
+      <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior">‹</button>
+      <div class="album-container" #albumContainer>
+        <div class="album-item" *ngFor="let img of ['1.webp', '2.jpg', '3.jpg', '4.jpg']">
+          <div class="image-card">
+            <img [src]="'assets/fotosInicio/' + img" alt="Instalaciones" (click)="openPhoto('assets/fotosInicio/' + img)" />
+          </div>
+        </div>
+      </div>
+      <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente">›</button>
+    </div>
 
-  <!-- Image card -->
-  <!-- Album: horizontal swipeable gallery -->
-  <div class="album-wrapper">
-    <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior" title="Anterior">‹</button>
-    <div class="album-container" #albumContainer role="album" aria-label="Galería">
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/1.webp" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/1.webp')" style="cursor:pointer" />
+    <div class="opinions-section">
+      <h2 class="section-title">Lo que dicen de nosotros</h2>
+
+      <div class="reviews-grid" *ngIf="comments && comments.length; else noComments">
+        <div class="review-card" *ngFor="let c of comments">
+          <div class="review-header">
+            <img src="assets/avatar-placeholder.png" alt="avatar" class="review-avatar"/>
+            <div class="review-meta">
+              <h3>{{ c.name }}</h3>
+              <span class="comment-date">{{ c.date | date:'mediumDate' }}</span>
+            </div>
+            <div class="review-rating">{{ getStars(c.rating) }}</div>
+          </div>
+          <p class="comment-text">"{{ c.text }}"</p>
+        </div>
+      </div>
+      
+      <ng-template #noComments>
+        <div class="empty-state">Aún no hay opiniones. ¡Sé el primero en comentar!</div>
+      </ng-template>
+
+      <div class="leave-review-card">
+        <h3>Déjanos tu opinión</h3>
+        <form (ngSubmit)="addComment()" class="new-comment-form">
+          <ion-item lines="full" class="custom-input">
+            <ion-label position="floating">Tu nombre</ion-label>
+            <ion-input type="text" required [(ngModel)]="newComment.name" name="name"></ion-input>
+          </ion-item>
+
+          <ion-item lines="full" class="custom-input">
+            <ion-label position="floating">¿Qué te ha parecido?</ion-label>
+            <ion-textarea required [(ngModel)]="newComment.text" name="text" rows="3"></ion-textarea>
+          </ion-item>
+
+          <ion-item lines="none" class="rating-select">
+            <ion-label>Tu valoración</ion-label>
+            <ion-select [(ngModel)]="newComment.rating" name="rating">
+              <ion-select-option *ngFor="let r of [5,4,3,2,1]" [value]="r">{{r}} Estrellas</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" class="submit-btn" shape="round">Publicar Opinión</ion-button>
+        </form>
+      </div>
+    </div>
+
+    <div class="contact-section">
+      <h2 class="section-title">¿Necesitas ayuda?</h2>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <div class="icon-circle"><ion-icon name="call"></ion-icon></div>
+          <div class="contact-info">
+            <h4>Llámanos</h4>
+            <p>{{ contact.phone }}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon-circle"><ion-icon name="mail"></ion-icon></div>
+          <div class="contact-info">
+            <h4>Escríbenos</h4>
+            <p>{{ contact.email }}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon-circle"><ion-icon name="location"></ion-icon></div>
+          <div class="contact-info">
+            <h4>Visítanos</h4>
+            <p>{{ contact.location }}</p>
+          </div>
         </div>
       </div>
     </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/2.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/2.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/3.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/3.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/4.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/4.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    </div>
-    <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente" title="Siguiente">›</button>
+
   </div>
-
-  <!-- Section title -->
-  <h1 class="section-title">NUESTRAS INSTALACIONES</h1>
-
-  <!-- Image card -->
-  <!-- Album: horizontal swipeable gallery -->
-  <div class="album-wrapper">
-    <button class="album-btn prev" (click)="prevSlideFromEvent($event, true)" aria-label="Anterior" title="Anterior">‹</button>
-    <div class="album-container" #albumContainer role="album" aria-label="Galería">
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/1.webp" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/1.webp')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/2.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/2.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/3.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/3.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    <div class="album-item">
-      <div class="image-card">
-        <div class="thumb-100x50">
-          <img src="assets/fotosInicio/4.jpg" alt="Paisaje" (click)="openPhoto('assets/fotosInicio/4.jpg')" style="cursor:pointer" />
-        </div>
-      </div>
-    </div>
-    </div>
-    <button class="album-btn next" (click)="nextSlideFromEvent($event, true)" aria-label="Siguiente" title="Siguiente">›</button>
-  </div>
-
-  <!-- Sección de opiniones debajo del segundo álbum -->
-  <div class="opinions-section ion-padding">
-    <h2 class="section-subtitle">Opiniones</h2>
-
-    <!-- Lista de opiniones anteriores -->
-    <div *ngIf="comments && comments.length; else noComments">
-      <ion-list>
-        <ion-item *ngFor="let c of comments">
-          <ion-avatar slot="start">
-            <img src="assets/avatar-placeholder.png" alt="avatar" />
-          </ion-avatar>
-          <ion-label>
-            <h3>{{ c.name }} <span class="rating">{{ getStars(c.rating) }}</span></h3>
-            <p class="comment-text">{{ c.text }}</p>
-            <p class="comment-date">{{ c.date | date:'short' }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </div>
-    <ng-template #noComments>
-      <p class="muted">Aún no hay opiniones. Sé el primero en comentar.</p>
-    </ng-template>
-
-    <!-- Formulario para nueva opinión -->
-    <form (ngSubmit)="addComment()" class="new-comment-form">
-      <ion-item>
-        <ion-label position="floating">Nombre</ion-label>
-        <ion-input type="text" required [(ngModel)]="newComment.name" name="name"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Comentario</ion-label>
-        <ion-textarea required [(ngModel)]="newComment.text" name="text"></ion-textarea>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Valoración</ion-label>
-        <ion-select [(ngModel)]="newComment.rating" name="rating">
-          <ion-select-option *ngFor="let r of [5,4,3,2,1]" [value]="r">{{r}} ★</ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <div class="form-actions">
-        <ion-button expand="block" type="submit">Enviar opinión</ion-button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Cuadro de contacto debajo de Opiniones -->
-  <div class="contact-card ion-padding">
-    <h2 class="section-subtitle">Contacto</h2>
-    <ion-card>
-      <ion-card-content class="contact-rows">
-        <ion-item lines="none">
-          <div class="contact-value">{{ contact.phone }}</div>
-        </ion-item>
-
-        <ion-item lines="none">
-          <div class="contact-value">{{ contact.email }}</div>
-        </ion-item>
-
-        <ion-item lines="none">
-          <div class="contact-value">{{ contact.location }}</div>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-  </div>
-
 </ion-content>
-
