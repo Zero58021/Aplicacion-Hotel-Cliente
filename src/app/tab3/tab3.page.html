@@ -7,23 +7,32 @@
 
   <div class="ion-padding">
     <ng-template #noCriteria></ng-template>
-    <ng-container *ngIf="selectedRoom; else noSelection">
-      <ion-card class="selection-card">
+    
+    <ng-container *ngIf="selectedCart && selectedCategories.length > 0; else noSelection">
+      
+      <ion-card class="selection-card" *ngFor="let room of selectedCategories">
           <div class="selection-inner">
+            
             <div class="room-thumb">
-              <img [src]="selectedRoom.photos && selectedRoom.photos.length ? selectedRoom.photos[0] : 'assets/fotosInicio/1.webp'" alt="Foto" />
+              <div class="qty-badge" *ngIf="room.qty > 1">{{ room.qty }}x</div>
+              <img [src]="room.photos && room.photos.length ? room.photos[0] : 'assets/fotosInicio/1.webp'" alt="Foto" />
             </div>
 
             <div class="room-info">
-              <div class="room-title">{{ selectedRoom.name }}</div>
-              <div class="room-sub">{{ selectedRoom.type }} · {{ selectedRoom.floor }}</div>
+              <div class="room-title">{{ room.name }}</div>
+              <div class="room-sub">{{ room.type }}</div>
               <div class="room-meta">
                 <div class="rating">
-                  <ng-container *ngFor="let _ of (selectedRoom.rating ? [].constructor(selectedRoom.rating) : [])">★</ng-container>
-                  <ng-container *ngIf="!selectedRoom.rating">Sin valoración</ng-container>
+                  <ng-container *ngFor="let _ of getStarsArray(room.rating)">★</ng-container>
+                  <ng-container *ngIf="!room.rating">Sin valoración</ng-container>
                 </div>
-                <div class="price"><strong>Total:</strong> {{ selectedRoom.price }} € <span class="old" *ngIf="selectedRoom.oldPrice">{{ selectedRoom.oldPrice }} €</span></div>
-                <div class="extras"><strong>Extras:</strong> {{ selectedRoom.amenities && selectedRoom.amenities.length ? selectedRoom.amenities.join(', ') : 'Estándar' }}</div>
+                <div class="price">
+                  <strong>Total:</strong> {{ room.price * room.qty }} € 
+                  <span class="old" *ngIf="room.oldPrice">{{ room.oldPrice * room.qty }} €</span>
+                </div>
+                <div class="extras">
+                  <strong>Extras:</strong> {{ room.amenities && room.amenities.length ? room.amenities.join(', ') : 'Estándar' }}
+                </div>
               </div>
             </div>
 
@@ -40,9 +49,11 @@
                 <div class="res-title muted">Sin fechas</div>
               </ng-template>
             </div>
+
           </div>
       </ion-card>
     </ng-container>
+
     <ng-template #noSelection>
       <div class="empty-selection">No hay ninguna habitación seleccionada.</div>
     </ng-template>
@@ -58,7 +69,7 @@
           <ion-item *ngFor="let p of pensions" lines="full" class="pension-item">
             <ion-radio slot="start" [value]="p.id"></ion-radio>
             <ion-label>
-              <h3 class="pension-name">{{ p.name }} <span class="pension-price">+{{ p.price }}€/día</span></h3>
+              <h3 class="pension-name">{{ p.name }} <span class="pension-price" *ngIf="p.price > 0">+{{ p.price }}€/día</span></h3>
               <p class="pension-desc">{{ p.includes && p.includes.length ? p.includes.join(' • ') : 'Solo alojamiento' }}</p>
             </ion-label>
             <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="selectedPensionId === p.id"></ion-icon>

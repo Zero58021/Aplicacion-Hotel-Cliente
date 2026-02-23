@@ -12,6 +12,15 @@
   padding-top: 10px;
 }
 
+/* Badge de cantidad sobre la foto */
+.room-thumb { position: relative; }
+.qty-badge {
+  position: absolute; top: -6px; left: -6px; background: var(--ion-color-primary); color: white;
+  font-weight: 800; font-size: 12px; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
 /* Tarjetas base */
 .shadow-card {
   border-radius: 16px;
@@ -40,6 +49,7 @@ ion-card-title {
   padding: 12px;
   background: #ffffff;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  margin-bottom: 12px;
   margin-top: 0;
 }
 
@@ -125,7 +135,6 @@ ion-card-title {
   background: rgba(var(--ion-color-primary-rgb), 0.02);
 }
 
-/* AJUSTES PARA EL HEADER Y EL BOTÓN "USAR MIS DATOS" */
 .form-header {
   display: flex;
   justify-content: space-between;
@@ -212,7 +221,7 @@ ion-card-title {
   .use-data-btn { align-self: flex-start; }
 }
 
-/* Resumen de pasajeros (Lista visual) */
+/* Resumen de pasajeros */
 .passengers-summary {
   display: flex;
   flex-direction: column;
@@ -301,31 +310,11 @@ ion-card-title {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Estilo específico para el botón "Atrás" en la esquina inferior izquierda */
 .bottom-left-button .back-button {
   min-width: 96px;
   border-radius: 24px;
   --background: #ffffff;
   color: #2e7d32;
-  --border-color: #2e7d32;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-/* Override final para forzar exactamente el mismo formato que en tab2 */
-.bottom-left-button {
-  position: fixed;
-  left: 16px;
-  /* place the button above the tab bar and respect safe-area-inset */
-  bottom: calc(10px);
-  z-index: 14000;
-  transform: translateY(0);
-}
-.bottom-left-button ion-button {
-  min-width: 96px;
-  border-radius: 24px;
-  --background: #ffffff;
-  color: #2e7d32;
-  font-weight: 400;
   --border-color: #2e7d32;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }

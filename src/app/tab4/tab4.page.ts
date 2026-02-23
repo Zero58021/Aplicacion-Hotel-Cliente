@@ -17,7 +17,10 @@ import { ApiService } from '../services/api';
   styleUrls: ['./tab4.page.scss'],
 })
 export class Tab4Page implements OnInit, OnDestroy {
-  selectedRoom: any | null = null;
+  // NUEVAS VARIABLES PARA EL CARRITO
+  selectedCart: any = null;
+  selectedCategories: any[] = [];
+  
   criteria: SearchCriteria | null = null;
   passengers: Array<any> = [];
   selectedPensionId: string | null = null;
@@ -35,14 +38,8 @@ export class Tab4Page implements OnInit, OnDestroy {
   paymentMethod: 'online' | 'inperson' | null = null; 
   paymentSuccess = false;
 
-  // --- DATOS DE LA TARJETA Y MARCA (AHORA CON BANCOS DE ESPAÑA) ---
   cardBrand: 'santander' | 'bbva' | 'caixabank' | 'ing' | 'bankinter' | 'visa' | 'mastercard' | 'amex' | 'unknown' = 'unknown';
-  cardDetails = {
-    number: '',
-    expiry: '',
-    cvv: '',
-    name: ''
-  };
+  cardDetails = { number: '', expiry: '', cvv: '', name: '' };
 
   constructor(
     private selectionService: SelectionService, 
@@ -55,7 +52,15 @@ export class Tab4Page implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.selectionService.loadFromStorage();
-    this.sub = this.selectionService.selectedRoom$.subscribe(r => this.selectedRoom = r);
+    
+    // LEER EL CARRITO
+    this.sub = this.selectionService.selectedRoom$.subscribe(cart => {
+      if (cart && cart.selectedCategories) {
+        this.selectedCart = cart;
+        this.selectedCategories = cart.selectedCategories;
+      }
+    });
+    
     this.criteriaSub = this.searchService.criteria$.subscribe(c => this.criteria = c);
   }
 
@@ -112,10 +117,9 @@ export class Tab4Page implements OnInit, OnDestroy {
   }
 
   get roomCost(): number {
-    if (!this.selectedRoom || !this.selectedRoom.price) return 0;
-    const price = Number(this.selectedRoom.price) || 0;
-    const rooms = Number(this.criteria?.rooms || 1) || 1;
-    return price * this.nights * rooms;
+    if (!this.selectedCart || !this.selectedCart.totalPrice) return 0;
+    // El totalPrice del carrito es por 1 noche. Lo multiplicamos por las noches.
+    return this.selectedCart.totalPrice * this.nights;
   }
 
   get pensionCost(): number {
@@ -139,7 +143,7 @@ export class Tab4Page implements OnInit, OnDestroy {
       componentProps: {
         data: {
           criteria: this.criteria,
-          selectedRoom: this.selectedRoom,
+          selectedCart: this.selectedCart, // Le pasamos el carrito entero al modal info
           selectedPension: this.selectedPension,
           passengers: this.passengers 
         }
@@ -149,38 +153,24 @@ export class Tab4Page implements OnInit, OnDestroy {
   }
 
   // ==========================================
-  // LÓGICA DE FORMATEO Y DETECCIÓN DE BANCOS
+  // LÓGICA DE FORMATEO Y DETECCIÓN DE BANCOS (Intacta)
   // ==========================================
 
   onCardNumberChange(event: any) {
     const inputElement = event.target;
-    // Extraemos solo los números
     let input = inputElement.value.replace(/\D/g, ''); 
     
-    // DETECCIÓN DE BANCO ESPAÑOL Y MARCA
-    if (input.startsWith('41')) {
-      this.cardBrand = 'santander';
-    } else if (input.startsWith('42')) {
-      this.cardBrand = 'bbva';
-    } else if (input.startsWith('43')) {
-      this.cardBrand = 'caixabank';
-    } else if (input.startsWith('44')) {
-      this.cardBrand = 'ing';
-    } else if (input.startsWith('45')) {
-      this.cardBrand = 'bankinter';
-    } else if (input.startsWith('4')) {
-      this.cardBrand = 'visa';
-    } else if (input.startsWith('5') || input.startsWith('2')) {
-      this.cardBrand = 'mastercard';
-    } else if (input.startsWith('3')) {
-      this.cardBrand = 'amex'; 
-    } else {
-      this.cardBrand = 'unknown';
-    }
+    if (input.startsWith('41')) this.cardBrand = 'santander';
+    else if (input.startsWith('42')) this.cardBrand = 'bbva';
+    else if (input.startsWith('43')) this.cardBrand = 'caixabank';
+    else if (input.startsWith('44')) this.cardBrand = 'ing';
+    else if (input.startsWith('45')) this.cardBrand = 'bankinter';
+    else if (input.startsWith('4')) this.cardBrand = 'visa';
+    else if (input.startsWith('5') || input.startsWith('2')) this.cardBrand = 'mastercard';
+    else if (input.startsWith('3')) this.cardBrand = 'amex'; 
+    else this.cardBrand = 'unknown';
 
-    // Insertar un espacio cada 4 números para que quede bonito
     let formatted = input.match(/.{1,4}/g)?.join(' ') || '';
-    
     this.cardDetails.number = formatted;
     inputElement.value = formatted; 
   }
@@ -188,12 +178,8 @@ export class Tab4Page implements OnInit, OnDestroy {
   onExpiryChange(event: any) {
     const inputElement = event.target;
     let input = inputElement.value.replace(/\D/g, '');
-    
     let formatted = input;
-    if (input.length > 2) {
-      formatted = input.substring(0, 2) + '/' + input.substring(2, 4);
-    }
-    
+    if (input.length > 2) formatted = input.substring(0, 2) + '/' + input.substring(2, 4);
     this.cardDetails.expiry = formatted;
     inputElement.value = formatted;
   }
@@ -201,31 +187,26 @@ export class Tab4Page implements OnInit, OnDestroy {
   onCvvChange(event: any) {
     const inputElement = event.target;
     let input = inputElement.value.replace(/\D/g, '');
-    
     const maxLength = this.cardBrand === 'amex' ? 4 : 3;
     let formatted = input.substring(0, maxLength);
-    
     this.cardDetails.cvv = formatted;
     inputElement.value = formatted;
   }
 
   isCardValid(): boolean {
     if (this.paymentMethod !== 'online') return true;
-    
     const numRaw = this.cardDetails.number.replace(/\s/g, '');
     const expRaw = this.cardDetails.expiry;
     const cvvRaw = this.cardDetails.cvv;
-    
     const isNumValid = (this.cardBrand === 'amex' && numRaw.length === 15) || (numRaw.length === 16);
     const isExpValid = expRaw.length === 5; 
     const isCvvValid = cvvRaw.length === (this.cardBrand === 'amex' ? 4 : 3);
     const isNameValid = this.cardDetails.name.trim().length > 3;
-
     return isNumValid && isExpValid && isCvvValid && isNameValid;
   }
 
   // ==========================================
-  // PROCESO DE PAGO
+  // PROCESO DE PAGO Y CREACIÓN DE RESERVA PENDIENTE
   // ==========================================
 
   async payWithGooglePay(ev?: Event) {
@@ -271,6 +252,7 @@ export class Tab4Page implements OnInit, OnDestroy {
           const primary = this.passengers.find(p => p.isPrimary) || this.passengers[0] || {} as any;
           const nombre = ((primary.name || '') + ' ' + (primary.lastName || '')).trim() || 'Cliente';
           
+          // GENERAMOS EL OBJETO DE RESERVA PARA EL BACKEND
           const reservation = {
             id: 'R-' + Math.floor(Math.random() * 900000 + 100000),
             nombreCliente: nombre,
@@ -283,16 +265,13 @@ export class Tab4Page implements OnInit, OnDestroy {
             children: Number(this.criteria?.children || 0),
             pax: (Number(this.criteria?.adults || 0) + Number(this.criteria?.children || 0)) || 1,
             nights: this.nights || 0,
-            roomPrice: this.selectedRoom?.price ? Number(this.selectedRoom.price) : 0,
-            pensionPrice: this.selectedPension ? Number(this.selectedPension.price || 0) : 0,
+            roomPrice: this.roomCost, 
+            pensionPrice: this.pensionCost,
             total: Number((this.totalCost || 0).toFixed(2)),
-            selectedRoom: this.selectedRoom ? {
-              name: this.selectedRoom.name,
-              type: this.selectedRoom.type,
-              floor: this.selectedRoom.floor,
-              price: this.selectedRoom.price,
-              amenities: this.selectedRoom.amenities || []
-            } : null,
+            
+            // NUEVO: Guardamos el Carrito entero (Categorías + Cantidades)
+            selectedCategories: this.selectedCategories,
+            
             selectedPension: this.selectedPension ? {
               id: this.selectedPension.id,
               name: this.selectedPension.name,
@@ -309,7 +288,9 @@ export class Tab4Page implements OnInit, OnDestroy {
               allergies: p.allergies || '',
               type: p.type || 'adult'
             })) : [],
-            estado: 'Confirmada',
+            
+            // ESTADO CLAVE: Las reservas web entran como "Pendiente"
+            estado: 'Pendiente', 
             notas: primary.allergies || ''
           };
 

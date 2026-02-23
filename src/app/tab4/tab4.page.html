@@ -20,8 +20,8 @@
               <div class="summary-line">
                 <div class="label">Alojamiento ({{ nights }} noches)</div>
                 <div class="value">
-                  <span *ngIf="selectedRoom">{{ roomCost | number:'1.2-2' }} €</span>
-                  <span *ngIf="!selectedRoom">—</span>
+                  <span *ngIf="selectedCart">{{ roomCost | number:'1.2-2' }} €</span>
+                  <span *ngIf="!selectedCart">—</span>
                 </div>
               </div>
               <div class="summary-line">
@@ -37,8 +37,8 @@
               <div class="summary-total summary-line">
                 <div class="label"><strong>Total a pagar:</strong></div>
                 <div class="value total-price">
-                  <span *ngIf="(selectedRoom || selectedPension)">{{ totalCost | number:'1.2-2' }} €</span>
-                  <span *ngIf="!selectedRoom && !selectedPension">—</span>
+                  <span *ngIf="(selectedCart || selectedPension)">{{ totalCost | number:'1.2-2' }} €</span>
+                  <span *ngIf="!selectedCart && !selectedPension">—</span>
                 </div>
               </div>
             </ion-card-content>

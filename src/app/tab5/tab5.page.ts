@@ -13,7 +13,7 @@ import { UserProfileModalComponent } from '../user-profile-modal/user-profile-mo
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// ¡NUEVO! Magia nativa para móviles
+// Magia nativa para móviles
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
@@ -97,7 +97,18 @@ export class Tab5Page implements OnInit {
     return Number(((roomPrice * nights) + (pensionPrice * persons * nights)).toFixed(2));
   }
 
+  // Helper para generar el título principal de la tarjeta
+  getRoomTitle(res: any): string {
+    if (res.selectedCategories && res.selectedCategories.length > 0) {
+      const first = res.selectedCategories[0];
+      const count = res.selectedCategories.reduce((sum: number, c: any) => sum + (c.qty || 1), 0);
+      return count > 1 ? `${first.name} (+${count - 1} más)` : first.name;
+    }
+    return res.selectedRoom?.name || 'Reserva de Alojamiento';
+  }
+
   async openInfo(res: any) {
+    // Adaptamos los datos para usar el mismo componente Modal que ya arreglamos antes
     const modal = await this.modalCtrl.create({
       component: ReservationInfoComponent,
       componentProps: {
@@ -109,7 +120,10 @@ export class Tab5Page implements OnInit {
             children: res.children || 0,
             rooms: res.habitaciones || 1
           },
-          selectedRoom: res.selectedRoom || { name: 'Estándar', price: res.roomPrice || 0 },
+          selectedCart: {
+            selectedCategories: res.selectedCategories || [],
+            totalRooms: res.habitaciones || 1
+          },
           selectedPension: res.selectedPension || { name: 'Sin Pensión', price: res.pensionPrice || 0, includes: [] },
           passengers: res.passengers || []
         }
@@ -142,7 +156,7 @@ export class Tab5Page implements OnInit {
   }
 
   // ==========================================
-  // GENERACIÓN DE PDF
+  // GENERACIÓN DE PDF MEJORADA (Múltiples habitaciones)
   // ==========================================
   async downloadPDF(res: any) {
     const loading = await this.loadingCtrl.create({
@@ -152,7 +166,6 @@ export class Tab5Page implements OnInit {
     await loading.present();
 
     try {
-      // 1. Crear un contenedor oculto en el DOM
       const element = document.createElement('div');
       element.id = 'pdf-container';
       element.style.position = 'absolute';
@@ -162,10 +175,27 @@ export class Tab5Page implements OnInit {
       element.style.background = '#f4f5f8';
       element.style.padding = '40px';
       
-      // 2. Extraer el Titular
       const titular = res.passengers?.find((p:any) => p.isPrimary) || res.passengers?.[0] || { name: res.nombreCliente || 'Cliente', lastName: '' };
       
-      // 3. Montar el HTML
+      // Construimos el HTML de las habitaciones dinámicamente
+      let roomsHtml = '';
+      if (res.selectedCategories && res.selectedCategories.length > 0) {
+        res.selectedCategories.forEach((room: any) => {
+          roomsHtml += `
+            <div style="background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+              <p style="margin: 0 0 5px; font-size: 16px; font-weight: bold;">
+                <span style="background: #1b5e20; color: white; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 6px;">${room.qty}x</span> 
+                ${room.name}
+              </p>
+              <p style="margin: 0 0 5px; font-size: 14px; color: #555;">Tipo: ${room.type}</p>
+              <p style="margin: 0; font-size: 14px; color: #777;">Extras: ${room.amenities?.join(', ') || 'Estándar'}</p>
+            </div>
+          `;
+        });
+      } else {
+        roomsHtml = `<p style="margin: 0; font-size: 16px;">Habitación: ${res.selectedRoom?.name || 'Estándar'}</p>`;
+      }
+
       element.innerHTML = `
         <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; font-family: sans-serif;">
           
@@ -198,35 +228,36 @@ export class Tab5Page implements OnInit {
             <div style="display: flex; gap: 40px;">
               <div style="flex: 1;">
                  <h3 style="margin: 0 0 15px; color: #1b5e20; font-size: 20px;">Alojamiento</h3>
-                 <p style="margin: 0 0 8px; font-size: 16px;"><strong>Habitación:</strong> ${res.selectedRoom?.name || 'Estándar'}</p>
-                 <p style="margin: 0 0 8px; font-size: 16px;"><strong>Ocupantes:</strong> ${res.adults || 0} Ad, ${res.children || 0} Ni</p>
-                 <p style="margin: 0 0 8px; font-size: 16px;"><strong>Cantidad:</strong> ${res.habitaciones || 1} habs.</p>
+                 ${roomsHtml}
+                 <p style="margin: 15px 0 0; font-size: 16px; color: #555;"><strong>Ocupantes totales:</strong> ${res.adults || 0} Ad, ${res.children || 0} Ni</p>
               </div>
               <div style="flex: 1;">
-                 <h3 style="margin: 0 0 15px; color: #1b5e20; font-size: 20px;">Régimen</h3>
-                 <p style="margin: 0 0 8px; font-size: 16px;"><strong>Pensión:</strong> ${res.selectedPension?.name || 'Solo Alojamiento'}</p>
-                 <p style="margin: 0; font-size: 16px;"><strong>Estado:</strong> <span style="color: ${res.estado === 'Confirmada' ? '#4caf50' : '#f44336'}; font-weight: bold;">${res.estado || 'Confirmada'}</span></p>
+                 <h3 style="margin: 0 0 15px; color: #1b5e20; font-size: 20px;">Condiciones</h3>
+                 <p style="margin: 0 0 12px; font-size: 16px;"><strong>Pensión:</strong> ${res.selectedPension?.name || 'Solo Alojamiento'}</p>
+                 <div style="background: ${res.estado === 'Confirmada' ? '#e8f5e9' : '#fff3e0'}; padding: 12px; border-radius: 8px;">
+                   <p style="margin: 0; font-size: 16px; color: #333;">
+                     <strong>Estado de Reserva:</strong> 
+                     <span style="color: ${res.estado === 'Confirmada' ? '#4caf50' : '#f57c00'}; font-weight: bold; margin-left: 5px;">${res.estado || 'Pendiente'}</span>
+                   </p>
+                 </div>
               </div>
             </div>
 
             <hr style="border: none; border-top: 2px dashed #eee; margin: 30px 0;">
 
             <div style="text-align: right;">
-               <p style="color: #666; font-size: 16px; margin: 0 0 5px; text-transform: uppercase;">Importe Total Abonado</p>
+               <p style="color: #666; font-size: 16px; margin: 0 0 5px; text-transform: uppercase;">Importe Total</p>
                <h2 style="margin: 0; font-size: 32px; color: #111;">${this.formatCurrency(this.displayTotal(res))}</h2>
             </div>
           </div>
         </div>
       `;
 
-      // 4. Lo añadimos al documento
       document.body.appendChild(element);
 
-      // 5. html2canvas hace la foto
       const canvas = await html2canvas(element, { scale: 2, useCORS: true });
       const imgData = canvas.toDataURL('image/png');
 
-      // 6. jsPDF crea el documento
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -235,32 +266,24 @@ export class Tab5Page implements OnInit {
       
       const fileName = `Reserva_${res.id || 'Hotel'}.pdf`;
 
-      // 7. MAGIA MULTIPLATAFORMA: Guardar y Compartir según estemos en App o Web
       if (Capacitor.isNativePlatform()) {
-        // En Móvil: Sacamos el base64 limpio (sin las cabeceras "data:application/pdf...")
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
-        
-        // Lo guardamos temporalmente en el sistema de archivos del móvil
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: pdfBase64,
           directory: Directory.Cache
         });
 
-        // Lanzamos la pestaña nativa del móvil (WhatsApp, Guardar Archivos, Mail...)
         await Share.share({
           title: 'Detalles de tu Reserva',
           text: 'Aquí tienes el comprobante de tu reserva en nuestro hotel.',
           url: savedFile.uri,
           dialogTitle: 'Compartir o Guardar Reserva'
         });
-
       } else {
-        // En Ordenador (Web): Usamos la descarga normal que ya tenías
         pdf.save(fileName);
       }
 
-      // 8. Limpiamos
       document.body.removeChild(element);
       await loading.dismiss();
 

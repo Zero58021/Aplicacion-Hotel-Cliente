@@ -326,7 +326,7 @@
   position: fixed;
   left: 16px;
   /* place the button above the tab bar and respect safe-area-inset */
-  bottom: calc(15px + env(safe-area-inset-bottom));
+  bottom: calc(10px);
   z-index: 14000;
   transform: translateY(0);
 }

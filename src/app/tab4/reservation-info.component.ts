@@ -7,8 +7,6 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, CommonModule],
   selector: 'app-reservation-info',
   template: `
-
-
     <ion-content class="bg-light ion-padding">
       
       <div class="ticket-container">
@@ -37,7 +35,7 @@ import { CommonModule } from '@angular/common';
               <span class="value">{{ data?.criteria?.adults ?? 0 }} Ad, {{ data?.criteria?.children ?? 0 }} Ni</span>
             </div>
             <div class="data-block">
-              <span class="label">Habitaciones</span>
+              <span class="label">Total Habitaciones</span>
               <span class="value">{{ data?.criteria?.rooms ?? 1 }}</span>
             </div>
             
@@ -55,20 +53,33 @@ import { CommonModule } from '@angular/common';
 
         <div class="ticket-section">
           <div class="section-title">
-            <ion-icon name="key-outline"></ion-icon> Alojamiento
+            <ion-icon name="key-outline"></ion-icon> Alojamiento ({{ data?.selectedCart?.totalRooms || 0 }})
           </div>
-          <div class="info-row">
-            <span class="info-label">Habitación</span>
-            <span class="info-val fw-bold">{{ data?.selectedRoom?.name ?? 'Sin seleccionar' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Detalles</span>
-            <span class="info-val">{{ data?.selectedRoom?.type ?? '-' }} • Planta {{ data?.selectedRoom?.floor ?? '-' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Extras</span>
-            <span class="info-val text-muted">{{ data?.selectedRoom?.amenities?.length ? (data.selectedRoom.amenities.join(', ')) : 'Sin extras' }}</span>
-          </div>
+          
+          <ng-container *ngIf="data?.selectedCart?.selectedCategories?.length; else noRooms">
+            <div class="cart-item" *ngFor="let room of data.selectedCart.selectedCategories">
+              <div class="info-row">
+                <span class="info-label">
+                  <span class="qty-badge-inline">{{ room.qty }}x</span> Habitación
+                </span>
+                <span class="info-val fw-bold">{{ room.name }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Detalles</span>
+                <span class="info-val">{{ room.type }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Extras</span>
+                <span class="info-val text-muted">{{ room.amenities?.length ? (room.amenities.join(', ')) : 'Estándar' }}</span>
+              </div>
+            </div>
+          </ng-container>
+          
+          <ng-template #noRooms>
+            <div class="info-row">
+              <span class="info-val">Sin seleccionar</span>
+            </div>
+          </ng-template>
         </div>
 
         <div class="ticket-divider dashed"></div>
@@ -220,6 +231,28 @@ import { CommonModule } from '@angular/common';
     
     .text-success { color: var(--ion-color-success) !important; }
 
+    /* Listado de carrito de habitaciones */
+    .cart-item {
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #eee;
+    }
+    .cart-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .qty-badge-inline {
+      background: var(--ion-color-primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-right: 4px;
+    }
+
     /* Filas de información (Habitación / Pensión) */
     .info-row {
       display: flex;
@@ -228,7 +261,7 @@ import { CommonModule } from '@angular/common';
       font-size: 0.95rem;
     }
     .info-row:last-child { margin-bottom: 0; }
-    .info-label { color: #666; font-weight: 500; }
+    .info-label { color: #666; font-weight: 500; display: flex; align-items: center;}
     .info-val { color: #222; text-align: right; max-width: 65%; }
     .fw-bold { font-weight: 700; font-size: 1.05rem; }
     .text-muted { color: #888; font-size: 0.85rem; line-height: 1.3;}
@@ -283,7 +316,6 @@ export class ReservationInfoComponent {
 
   constructor(private modalCtrl: ModalController) {}
 
-  // Ordenamos los pasajeros para que el Titular (isPrimary) siempre salga el primero en la lista
   get passengersList() {
     if (!this.data?.passengers) return [];
     return [...this.data.passengers].sort((a, b) => {

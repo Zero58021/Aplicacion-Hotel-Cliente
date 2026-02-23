@@ -17,7 +17,10 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./tab3.page.scss'],
 })
 export class Tab3Page implements OnInit, OnDestroy {
-  selectedRoom: any | null = null;
+  // VARIABLES PARA EL CARRITO
+  selectedCart: any = null;
+  selectedCategories: any[] = [];
+  
   private sub?: Subscription;
   criteria: SearchCriteria | null = null;
   private criteriaSub?: Subscription;
@@ -63,7 +66,15 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.selectionService.loadFromStorage();
-    this.sub = this.selectionService.selectedRoom$.subscribe(r => this.selectedRoom = r);
+    
+    // LEER EL CARRITO EN LUGAR DE UNA SOLA HABITACIÓN
+    this.sub = this.selectionService.selectedRoom$.subscribe(cart => {
+      if (cart && cart.selectedCategories) {
+        this.selectedCart = cart;
+        this.selectedCategories = cart.selectedCategories;
+      }
+    });
+
     this.criteriaSub = this.searchService.criteria$.subscribe(c => this.criteria = c);
     
     try {
@@ -164,7 +175,6 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.passengersErrors.unshift({ name: false, lastName: false, dni: false, phone: false, email: false });
   }
 
-  // --- NUEVA FUNCIÓN: USAR MIS DATOS ---
   useMyData(index: number) {
     const user = this.auth.getUser();
     if (!user) return;
@@ -177,17 +187,14 @@ export class Tab3Page implements OnInit, OnDestroy {
       lName = parts.slice(1).join(' ');
     }
 
-    // Actualizamos los datos del pasajero en ese índice
     this.passengers[index].name = fName;
     this.passengers[index].lastName = lName;
     this.passengers[index].phone = user.telefono || '';
     this.passengers[index].email = user.email || '';
     this.passengers[index].dni = user.dni || '';
 
-    // Limpiamos los posibles errores
     this.passengersErrors[index] = { name: false, lastName: false, dni: false, phone: false, email: false };
 
-    // Mostramos un mensaje de confirmación
     this.toastCtrl.create({
       message: 'Datos autocompletados correctamente',
       duration: 2000,
@@ -314,5 +321,11 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   closeEditing() {
     this.editingIndex = null;
+  }
+
+  // HELPER PARA PINTAR LAS ESTRELLAS
+  getStarsArray(rating: number): any[] {
+    const count = Math.max(0, Math.round(rating || 0));
+    return new Array(count);
   }
 }

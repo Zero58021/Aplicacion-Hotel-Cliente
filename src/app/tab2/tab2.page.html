@@ -1,17 +1,18 @@
 <ion-content #pageContent class="tab2-content" fullscreen (ionScroll)="onScroll($event)" [scrollEvents]="true">
-  <div class="ion-padding">
+  
+  <div class="header-wrapper">
     <ng-container *ngIf="criteria; else noCriteria">
       <ion-item lines="none" class="reservation-summary">
         <ion-label>
-          <h3>Reserva</h3>
+          <h3>Tu Selección</h3>
           <p class="reservation-dates">
             {{ criteria?.checkin | date:'shortDate' }} ➜ {{ criteria?.checkout | date:'shortDate' }}
           </p>
           <p class="reservation-meta">
-            {{ criteria?.adults }} Adultos • {{ criteria?.children }} Niños • {{ criteria?.rooms }} Habitaciones • {{ criteria?.pets ? 'Si mascotas' : 'No mascotas' }}
+            {{ criteria?.adults }} Adultos • {{ criteria?.children }} Niños • {{ criteria?.rooms }} Hab.
           </p>
         </ion-label>
-        <ion-button fill="clear" slot="end" (click)="edit()">Editar</ion-button>
+        <ion-button fill="clear" slot="end" (click)="edit()">Modificar</ion-button>
       </ion-item>
     </ng-container>
 
@@ -19,6 +20,23 @@
       <div class="no-criteria">Selecciona fechas y criterios para mostrar habitaciones.</div>
     </ng-template>
 
+    <div class="selected-rooms-sticky" *ngIf="totalSelectedRooms > 0">
+      <div class="summary-title">
+        Has seleccionado {{totalSelectedRooms}} de {{requestedRooms}} habitaciones:
+      </div>
+      <div class="summary-chips">
+        <div class="summary-chip" *ngFor="let c of getSelectedCategories()" (click)="scrollToRoom(c.type)">
+          <div class="chip-qty">{{c.selectedQty}}</div>
+          <div class="chip-name">{{c.type}}</div>
+          <div class="chip-price">{{ c.price * c.selectedQty }}€</div>
+          <ion-icon name="close-circle" class="remove-chip" (click)="c.selectedQty = 0; $event.stopPropagation()"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ion-padding content-padding-adjust">
+    
     <div class="filters-container">
       <ion-grid>
         <ion-row>
@@ -36,7 +54,7 @@
           <ion-col size="12" size-md="4">
             <ion-item class="compact">
               <ion-icon name="bed-outline" slot="start"></ion-icon>
-              <ion-label>Tipo habitación</ion-label>
+              <ion-label>Tipo</ion-label>
               <ion-select [(ngModel)]="selectedRoomType" (ionChange)="onFilterChange()" placeholder="Cualquiera">
                 <ion-select-option *ngFor="let t of roomTypes" [value]="t">{{ t }}</ion-select-option>
               </ion-select>
@@ -70,62 +88,66 @@
     </div>
 
     <div class="results-header">
-      <div class="count">{{ filteredRooms?.length || 0 }} habitaciones</div>
+      <div class="count">{{ filteredCategories?.length || 0 }} opciones disponibles</div>
     </div>
 
     <div class="rooms-list">
-      <ng-container *ngIf="filteredRooms?.length; else noRooms">
-        <div *ngFor="let r of filteredRooms" class="room-card" (click)="openRoomDetails(r)">
+      <ng-container *ngIf="filteredCategories?.length; else noRooms">
+        <div *ngFor="let c of filteredCategories" class="room-card" (click)="openRoomDetails(c)" [id]="'room-card-' + c.type">
+          
           <div class="room-image">
-            <img [src]="r.photos && r.photos.length ? r.photos[0] : 'assets/fotosInicio/1.webp'" alt="{{ r.name || 'Habitación' }}"/>
+            <img [src]="c.photos && c.photos.length ? c.photos[0] : 'assets/fotosInicio/1.webp'" alt="{{ c.name }}"/>
           </div>
+          
           <div class="room-content">
             <div class="room-header">
-              <div class="title">{{ r.name || 'Habitación de ejemplo' }}</div>
-              <div class="favorite" (click)="toggleFavorite(r, $event)">
-                <ion-icon [name]="r.favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              <div class="title">{{ c.name }}</div>
+              <div class="favorite" (click)="toggleFavorite(c, $event)">
+                <ion-icon [name]="c.favorite ? 'heart' : 'heart-outline'"></ion-icon>
               </div>
+            </div>
+
+            <div *ngIf="c.availableCount <= 3" class="urgency-badge">
+               ¡Solo quedan {{ c.availableCount }} habitaciones!
             </div>
 
             <div class="meta">
               <div class="stars">
-                <ng-container *ngFor="let _ of starsArray(r.rating); let i = index">
+                <ng-container *ngFor="let _ of starsArray(c.rating); let i = index">
                   <ion-icon name="star" style="color:#f5b50a"></ion-icon>
                 </ng-container>
-                <ng-container *ngFor="let _ of starsArray(5 - (r.rating || 0))">
+                <ng-container *ngFor="let _ of starsArray(5 - (c.rating || 0))">
                   <ion-icon name="star-outline" style="color:#f5b50a"></ion-icon>
                 </ng-container>
               </div>
             </div>
 
             <div class="badges">
-              <ng-container *ngIf="r.amenities && r.amenities.length">
-                <span *ngFor="let a of r.amenities" class="badge">{{ a }}</span>
+              <ng-container *ngIf="c.amenities && c.amenities.length">
+                <span *ngFor="let a of c.amenities" class="badge">{{ a }}</span>
               </ng-container>
             </div>
 
             <div class="price-row">
               <div class="price-left">
-                <div class="old-price">{{ r.oldPrice }} €</div>
-                <div class="price">{{ r.price }} €</div>
-                <div class="tax">Incluye tasas e impuestos</div>
-                <div class="total-price" *ngIf="criteria">
-                  <div class="total-labels">
-                    <span class="total-label">Total</span>
-                    <span class="total-meta">(<span class="rooms-count">{{ criteria?.rooms || 1 }}</span> hab.)</span>
-                  </div>
-                  <div class="total-amount">
-                    <span class="amount">{{ ((criteria?.rooms || 1) * r.price) | number:'1.2-2' }}</span>
-                    <span class="currency">€</span>
-                  </div>
-                </div>
+                <div class="old-price">{{ c.oldPrice }} €</div>
+                <div class="price">{{ c.price }} € <span class="tax">/ noche</span></div>
+                <div class="footer-note">Incluye tasas e impuestos</div>
               </div>
             </div>
 
-            <div class="footer-note">Precio sin Prime {{ r.oldPrice || r.price }} €</div>
-            <div class="room-actions">
-              <ion-button expand="block" color="primary" (click)="selectRoom(r, $event)">Seleccionar</ion-button>
+            <div class="room-actions-multi" (click)="$event.stopPropagation()">
+              <div class="modern-stepper">
+                <button class="stepper-btn minus" (click)="decreaseQty(c, $event)" [disabled]="c.selectedQty === 0">
+                  <ion-icon name="remove-outline"></ion-icon>
+                </button>
+                <div class="stepper-value" [class.has-value]="c.selectedQty > 0">{{ c.selectedQty }}</div>
+                <button class="stepper-btn plus" (click)="increaseQty(c, $event)" [disabled]="c.selectedQty >= c.availableCount || totalSelectedRooms >= requestedRooms">
+                  <ion-icon name="add-outline"></ion-icon>
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       </ng-container>
@@ -135,16 +157,38 @@
       <div class="no-rooms">No hay habitaciones que coincidan.</div>
     </ng-template>
 
-    
   </div>
+  
   <div class="bottom-spacer" aria-hidden="true"></div>
+
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="scroll-top-fab-wrapper" [class.visible]="showScrollTop" [attr.aria-hidden]="!showScrollTop">
     <ion-fab-button class="scroll-top-fab" (click)="scrollToTop()" [attr.aria-hidden]="!showScrollTop" [disabled]="!showScrollTop">
       <ion-icon name="arrow-up"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  
   <div class="bottom-left-button">
     <ion-button class="back-button" fill="outline" (click)="goToTab1($event)">ATRÁS</ion-button>
   </div>
+
 </ion-content>
 
+<div class="checkout-footer" *ngIf="criteria && requestedRooms > 0">
+  <div class="checkout-info">
+    <div class="rooms-count">
+      <ion-icon name="bed-outline"></ion-icon>
+      <span [class.complete]="totalSelectedRooms === requestedRooms">
+        {{ totalSelectedRooms }} de {{ requestedRooms }} seleccionadas
+      </span>
+    </div>
+    <div class="total-price" *ngIf="totalSelectedRooms > 0">
+      Total: <strong>{{ totalSelectedPrice | number:'1.2-2' }} €</strong>
+    </div>
+  </div>
+  
+  <ion-button class="checkout-btn" shape="round" color="primary" 
+              [disabled]="totalSelectedRooms !== requestedRooms" 
+              (click)="proceedToCheckout()">
+    Reservar
+  </ion-button>
+</div>
