@@ -22,19 +22,18 @@
     <ion-list *ngIf="reservations && reservations.length > 0; else noReservations" style="background: transparent;">
       
       <div *ngFor="let res of reservations" class="reservation-wrapper">
-        <ion-card class="reservation-card" [class.cancelled]="res.estado === 'Cancelada'">
+        <ion-card class="reservation-card" [class.cancelled]="res._estado === 'Cancelada'">
           
           <ion-card-header class="card-header">
             <div class="header-left">
               <ion-card-title class="name">{{ getRoomTitle(res) }}</ion-card-title>
               <ion-card-subtitle class="meta">
-                ID: {{ res.id }} · <span [class.cancel-text]="res.estado === 'Cancelada'">{{ res.estado }}</span>
+                ID: {{ res.id || res.numero }} · <span [class.cancel-text]="res._estado === 'Cancelada'">{{ res._estado }}</span>
               </ion-card-subtitle>
             </div>
             
             <div class="header-right">
-              
-              <ion-button fill="clear" color="success" (click)="downloadPDF(res)" *ngIf="res.estado !== 'Cancelada'" title="Descargar Voucher">
+              <ion-button fill="clear" color="success" (click)="downloadPDF(res)" *ngIf="res._estado !== 'Cancelada'" title="Descargar Voucher">
                 <ion-icon name="download-outline" slot="icon-only"></ion-icon>
               </ion-button>
 
@@ -42,7 +41,7 @@
                 <ion-icon name="information-circle-outline" slot="icon-only"></ion-icon>
               </ion-button>
               
-              <ion-button fill="clear" color="danger" (click)="cancelReservation(res)" *ngIf="res.estado !== 'Cancelada'" title="Cancelar">
+              <ion-button fill="clear" color="danger" (click)="cancelReservation(res)" *ngIf="res._estado !== 'Cancelada'" title="Cancelar">
                 <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </div>
@@ -62,10 +61,10 @@
             
             <div class="row small details">
               <div class="col">
-                <strong>Huéspedes:</strong> {{ (res.adults || 0) + (res.children || 0) }}
+                <strong>Huéspedes:</strong> {{ res._adults + res._children }}
               </div>
               <div class="col value-right">
-                Total: <span class="total-price">{{ formatCurrency(displayTotal(res)) }}</span>
+                Total: <span class="total-price">{{ formatCurrency(res._total) }}</span>
               </div>
             </div>
           </ion-card-content>

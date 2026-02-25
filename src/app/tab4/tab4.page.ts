@@ -291,7 +291,10 @@ export class Tab4Page implements OnInit, OnDestroy {
             
             // ESTADO CLAVE: Las reservas web entran como "Pendiente"
             estado: 'Pendiente', 
-            notas: primary.allergies || ''
+            notas: primary.allergies || '',
+
+            // LA LÍNEA MÁGICA QUE FALTABA:
+            mascota: this.criteria?.pets || false 
           };
 
           await this.addReservationToStorage(reservation);

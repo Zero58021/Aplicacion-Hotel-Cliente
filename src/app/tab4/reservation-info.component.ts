@@ -14,7 +14,12 @@ import { CommonModule } from '@angular/common';
         <div class="ticket-header">
           <ion-icon name="bed-outline"></ion-icon>
           <h2>Boleto de Reserva</h2>
-          <p>Revisa tu información antes del pago</p>
+          <p>Resumen de tu información</p>
+        </div>
+
+        <div class="status-banner" *ngIf="data?.estado" [ngClass]="data?.estado.toLowerCase() || 'pendiente'">
+          <ion-icon [name]="getStatusIcon(data?.estado)"></ion-icon>
+          <span>Estado: <strong>{{ data?.estado }}</strong></span>
         </div>
 
         <div class="ticket-section">
@@ -49,6 +54,13 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <div class="ticket-section" *ngIf="data?.alergiasGenerales" style="padding-top: 0;">
+           <div class="status-banner denegada" style="border-radius: 8px; justify-content: flex-start; margin-top: 10px;">
+             <ion-icon name="warning-outline"></ion-icon>
+             <span><strong>Alergias/Notas registradas:</strong> {{ data.alergiasGenerales }}</span>
+           </div>
+        </div>
+
         <div class="ticket-divider dashed"></div>
 
         <div class="ticket-section">
@@ -56,28 +68,33 @@ import { CommonModule } from '@angular/common';
             <ion-icon name="key-outline"></ion-icon> Alojamiento ({{ data?.selectedCart?.totalRooms || 0 }})
           </div>
           
-          <ng-container *ngIf="data?.selectedCart?.selectedCategories?.length; else noRooms">
+          <ng-container *ngIf="data?.selectedCart?.selectedCategories?.length; else fallbackRooms">
             <div class="cart-item" *ngFor="let room of data.selectedCart.selectedCategories">
               <div class="info-row">
                 <span class="info-label">
-                  <span class="qty-badge-inline">{{ room.qty }}x</span> Habitación
+                  <span class="qty-badge-inline">{{ room.qty || 1 }}x</span> Habitación
                 </span>
-                <span class="info-val fw-bold">{{ room.name }}</span>
+                <span class="info-val fw-bold">{{ room.name || 'Alojamiento' }}</span>
               </div>
-              <div class="info-row">
-                <span class="info-label">Detalles</span>
+              <div class="info-row" *ngIf="room.type">
+                <span class="info-label">Tipo</span>
                 <span class="info-val">{{ room.type }}</span>
               </div>
-              <div class="info-row">
+              <div class="info-row" *ngIf="room.amenities && room.amenities.length">
                 <span class="info-label">Extras</span>
-                <span class="info-val text-muted">{{ room.amenities?.length ? (room.amenities.join(', ')) : 'Estándar' }}</span>
+                <span class="info-val text-muted">{{ room.amenities.join(', ') }}</span>
               </div>
             </div>
           </ng-container>
           
-          <ng-template #noRooms>
-            <div class="info-row">
-              <span class="info-val">Sin seleccionar</span>
+          <ng-template #fallbackRooms>
+            <div class="cart-item">
+              <div class="info-row">
+                <span class="info-label">
+                  <span class="qty-badge-inline">{{ data?.criteria?.rooms || 1 }}x</span> Habitación
+                </span>
+                <span class="info-val fw-bold">Habitación Estándar</span>
+              </div>
             </div>
           </ng-template>
         </div>
@@ -106,7 +123,6 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <div *ngIf="passengersList.length > 0; else none">
-            
             <div class="passenger-card" *ngFor="let p of passengersList" [class.is-primary]="p.isPrimary">
               <div class="p-header">
                 <ion-icon [name]="p.isPrimary ? 'star' : 'person'"></ion-icon>
@@ -118,16 +134,22 @@ import { CommonModule } from '@angular/common';
                 <div class="p-row"><span>DNI:</span> {{ p.dni || 'No indicado' }}</div>
                 <div class="p-row" *ngIf="p.phone"><span>Tel:</span> {{ p.phone }}</div>
                 <div class="p-row" *ngIf="p.email"><span>Email:</span> {{ p.email }}</div>
-                <div class="p-row text-danger" *ngIf="p.allergies">
-                  <span>Alergias:</span> <strong>{{ p.allergies }}</strong>
+                <div class="p-row text-danger" *ngIf="p.allergies && p.allergies.toLowerCase() !== 'ninguna'">
+                  <span>Alergias (Pasajero):</span> <strong>{{ p.allergies }}</strong>
                 </div>
               </div>
             </div>
-
           </div>
           <ng-template #none>
-            <div class="empty-passengers">No hay datos de huéspedes registrados.</div>
+            <div class="empty-passengers">No hay datos de huéspedes registrados detalladamente.</div>
           </ng-template>
+        </div>
+
+        <div class="ticket-footer" *ngIf="data?.total">
+           <div class="total-row">
+              <span>IMPORTE TOTAL</span>
+              <span class="total-price">{{ formatCurrency(data?.total) }}</span>
+           </div>
         </div>
 
       </div>
@@ -148,7 +170,6 @@ import { CommonModule } from '@angular/common';
       --background: #f4f5f8;
     }
 
-    /* Diseño del Boleto / Ticket */
     .ticket-container {
       background: #ffffff;
       border-radius: 16px;
@@ -172,7 +193,15 @@ import { CommonModule } from '@angular/common';
     .ticket-header h2 { margin: 0; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px;}
     .ticket-header p { margin: 4px 0 0; font-size: 0.9rem; opacity: 0.9; }
 
-    /* Efecto de perforación del ticket */
+    .status-banner {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; font-size: 0.95rem; color: #fff;
+    }
+    .status-banner.pendiente { background: #f59e0b; }
+    .status-banner.confirmada { background: var(--ion-color-success, #10b981); }
+    .status-banner.denegada { background: var(--ion-color-danger, #ef4444); }
+    .status-banner.cancelada { background: #94a3b8; }
+
     .ticket-divider.dashed {
       height: 1px;
       background: transparent;
@@ -189,126 +218,61 @@ import { CommonModule } from '@angular/common';
       background: #f4f5f8;
       border-radius: 50%;
     }
-    .ticket-divider.dashed::before {
-      left: -30px;
-      box-shadow: inset -2px 0 4px rgba(0,0,0,0.03);
-    }
-    .ticket-divider.dashed::after {
-      right: -30px;
-      box-shadow: inset 2px 0 4px rgba(0,0,0,0.03);
-    }
+    .ticket-divider.dashed::before { left: -30px; box-shadow: inset -2px 0 4px rgba(0,0,0,0.03); }
+    .ticket-divider.dashed::after { right: -30px; box-shadow: inset 2px 0 4px rgba(0,0,0,0.03); }
 
-    .ticket-section {
-      padding: 20px;
-    }
+    .ticket-section { padding: 20px; }
     .pb-0 { padding-bottom: 20px; }
 
     .section-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #222;
-      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 1.1rem; font-weight: 800; color: #222; margin-bottom: 16px;
     }
-    .section-title ion-icon {
-      color: var(--ion-color-primary);
-      font-size: 1.4rem;
-    }
+    .section-title ion-icon { color: var(--ion-color-primary); font-size: 1.4rem; }
 
-    /* Grid para las fechas */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .data-block { display: flex; flex-direction: column; }
     .data-block.full-width { grid-column: 1 / -1; margin-top: 4px; }
-    
     .data-block .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
     .data-block .value { font-size: 0.95rem; font-weight: 700; color: #111; display:flex; align-items:center; gap: 4px; }
-    
     .text-success { color: var(--ion-color-success) !important; }
 
-    /* Listado de carrito de habitaciones */
     .cart-item {
-      background: #fafafa;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #eee;
+      background: #fafafa; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid #eee;
     }
-    .cart-item:last-child {
-      margin-bottom: 0;
-    }
-
+    .cart-item:last-child { margin-bottom: 0; }
     .qty-badge-inline {
-      background: var(--ion-color-primary);
-      color: white;
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 6px;
-      margin-right: 4px;
+      background: var(--ion-color-primary); color: white; font-size: 0.75rem; font-weight: 800;
+      padding: 2px 6px; border-radius: 6px; margin-right: 4px;
     }
 
-    /* Filas de información (Habitación / Pensión) */
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-    }
+    .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
     .info-row:last-child { margin-bottom: 0; }
     .info-label { color: #666; font-weight: 500; display: flex; align-items: center;}
     .info-val { color: #222; text-align: right; max-width: 65%; }
     .fw-bold { font-weight: 700; font-size: 1.05rem; }
     .text-muted { color: #888; font-size: 0.85rem; line-height: 1.3;}
 
-    /* Tarjetas de Pasajeros */
     .passenger-card {
-      background: #fafafa;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
+      background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
     }
     .passenger-card:last-child { margin-bottom: 0; }
-    
-    /* Resaltar Tarjeta Titular */
-    .passenger-card.is-primary {
-      background: rgba(var(--ion-color-primary-rgb), 0.05);
-      border: 1.5px solid rgba(var(--ion-color-primary-rgb), 0.3);
-    }
-
-    .p-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eaeaea;
-      padding-bottom: 8px;
-    }
+    .passenger-card.is-primary { background: rgba(var(--ion-color-primary-rgb), 0.05); border: 1.5px solid rgba(var(--ion-color-primary-rgb), 0.3); }
+    .p-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border-bottom: 1px solid #eaeaea; padding-bottom: 8px; }
     .p-header ion-icon { color: var(--ion-color-primary); font-size: 1.2rem; }
     .p-header strong { font-size: 0.95rem; color: #222; flex: 1; }
-    
     .p-body { font-size: 0.85rem; color: #555; display:flex; flex-direction:column; gap: 6px; }
     .p-row span { font-weight: 700; color: #333; width: 60px; display: inline-block; }
     .text-danger { color: var(--ion-color-danger); background: rgba(var(--ion-color-danger-rgb), 0.1); padding: 6px 8px; border-radius: 6px; margin-top: 2px;}
 
     .empty-passengers { color: #888; font-style: italic; text-align: center; padding: 10px; }
 
-    /* Botón de cierre */
-    .button-container {
-      margin-top: 24px;
-      margin-bottom: 30px;
-    }
-    .close-btn {
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    .ticket-footer { background: #f8fafc; padding: 20px; border-top: 2px dashed #ddd; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.2rem; color: #1e293b; }
+    .total-price { color: var(--ion-color-primary); font-size: 1.4rem; }
+
+    .button-container { margin-top: 24px; margin-bottom: 30px; }
+    .close-btn { font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   `]
 })
 export class ReservationInfoComponent {
@@ -326,6 +290,18 @@ export class ReservationInfoComponent {
 
   fmtDate(d: any) {
     try { return d ? new Date(d).toLocaleDateString() : '-'; } catch { return '-'; }
+  }
+
+  formatCurrency(val: number) {
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(Number(val) || 0);
+  }
+
+  getStatusIcon(status: string): string {
+    const s = String(status || '').toLowerCase();
+    if (s.includes('confirmada')) return 'checkmark-circle';
+    if (s.includes('cancelada')) return 'ban';
+    if (s.includes('denegada')) return 'close-circle';
+    return 'time';
   }
 
   close() { this.modalCtrl.dismiss(); }

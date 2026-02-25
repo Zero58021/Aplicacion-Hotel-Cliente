@@ -8,8 +8,9 @@ import { FormsModule } from '@angular/forms';
 import { SearchService, SearchCriteria } from '../services/search.service';
 import { SelectionService } from '../services/selection.service';
 import { ApiService } from '../services/api'; 
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-tab2',
@@ -34,6 +35,7 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
   rooms: any[] = [];
   filteredRooms: any[] = [];
   filteredCategories: any[] = [];
+  todasLasReservas: any[] = [];
 
   // ==========================================
   // LÓGICA DEL CARRITO
@@ -154,9 +156,13 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
   }
 
   loadRoomsFromServer() {
-    this.apiService.getHabitaciones().subscribe({
-      next: (data: any[]) => {
-        this.rooms = data.map((h: any) => ({
+    forkJoin({
+      habs: this.apiService.getHabitaciones(),
+      res: this.apiService.getReservas() 
+    }).subscribe({
+      next: (data: any) => {
+        this.todasLasReservas = data.res || [];
+        this.rooms = data.habs.map((h: any) => ({
           ...h,
           id: h.id,
           name: h.title || `Habitación ${h.numero}`,
@@ -177,7 +183,7 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
 
         setTimeout(() => this.ngAfterViewInit(), 500);
       },
-      error: (err: any) => console.error('Error cargando habitaciones del servidor', err)
+      error: (err: any) => console.error('Error cargando datos del servidor', err)
     });
   }
 
@@ -242,10 +248,15 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
     let nights = 1;
     let checkinDay = new Date().getDate();
     let isCheckinWeekend = false;
+    let reqInTime = 0;
+    let reqOutTime = 0;
 
     if (this.criteria && this.criteria.checkin && this.criteria.checkout) {
       const inDate = new Date(this.criteria.checkin);
       const outDate = new Date(this.criteria.checkout);
+      reqInTime = inDate.getTime();
+      reqOutTime = outDate.getTime();
+      
       const diffTime = Math.abs(outDate.getTime() - inDate.getTime());
       nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
       checkinDay = inDate.getDate();
@@ -255,8 +266,34 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const validRooms = this.rooms.filter(r => {
-      if (r.estado && r.estado !== 'Libre') return false;
+      
+      // 1. NUEVO FILTRO DE MASCOTAS
+      if (this.criteria && this.criteria.pets === true) {
+         const admite = r.condiciones?.permiteMascotas === true || r.amenities.includes('Mascotas');
+         if (!admite) return false;
+      }
 
+      // 2. NUEVO FILTRO DE DISPONIBILIDAD POR FECHAS (SOLAPAMIENTO)
+      if (reqInTime && reqOutTime) {
+         const isOccupied = this.todasLasReservas.some(reserva => {
+            const est = (reserva.estado || reserva.status || '').toLowerCase();
+            if (est.includes('cancelada') || est.includes('denegada')) return false;
+
+            const asignadas = (reserva.habitacion || '').split(',').map((h:string) => h.trim());
+            if (!asignadas.includes(String(r.numero))) return false;
+
+            const resIn = new Date(reserva.fechaEntrada).getTime();
+            const resOut = new Date(reserva.fechaSalida).getTime();
+
+            // Fórmula de solapamiento
+            return (reqInTime < resOut && resIn < reqOutTime);
+         });
+
+         if (isOccupied) return false;
+      }
+
+      // 3. TUS CONDICIONES HABITUALES
+      // (Ya no filtramos por r.estado === 'Libre' porque usamos fechas)
       const cond = r.condiciones || {};
       if (cond.bloqueadaTemporalmente) return false;
       if (cond.estanciaMinima && nights < cond.estanciaMinima) return false;
@@ -285,42 +322,21 @@ export class Tab2Page implements OnInit, OnDestroy, AfterViewInit {
     validRooms.forEach(r => {
       if (!grouped.has(r.type)) {
         grouped.set(r.type, {
-          id: r.type, 
-          type: r.type,
-          name: `Habitación ${r.type}`,
-          physicalRooms: [],
-          price: r.price,
-          oldPrice: r.oldPrice,
-          photos: [],
-          amenitiesSet: new Set(),
-          ratingSum: 0,
-          ratingCount: 0,
-          favorite: false
+          id: r.type, type: r.type, name: `Habitación ${r.type}`, physicalRooms: [],
+          price: r.price, oldPrice: r.oldPrice, photos: [], amenitiesSet: new Set(),
+          ratingSum: 0, ratingCount: 0, favorite: false
         });
       }
       
       const group = grouped.get(r.type);
       group.physicalRooms.push(r);
       
-      if (r.price < group.price) {
-        group.price = r.price;
-        group.oldPrice = r.oldPrice;
-      }
-      
+      if (r.price < group.price) { group.price = r.price; group.oldPrice = r.oldPrice; }
       if (r.photos && r.photos.length) {
-        r.photos.forEach((p: string) => {
-          if (!group.photos.includes(p)) group.photos.push(p);
-        });
+        r.photos.forEach((p: string) => { if (!group.photos.includes(p)) group.photos.push(p); });
       }
-
-      if (r.amenities) {
-        r.amenities.forEach((a: string) => group.amenitiesSet.add(a));
-      }
-
-      if (r.rating) {
-         group.ratingSum += r.rating;
-         group.ratingCount++;
-      }
+      if (r.amenities) { r.amenities.forEach((a: string) => group.amenitiesSet.add(a)); }
+      if (r.rating) { group.ratingSum += r.rating; group.ratingCount++; }
     });
 
     let finalCategories = Array.from(grouped.values()).map(g => {
